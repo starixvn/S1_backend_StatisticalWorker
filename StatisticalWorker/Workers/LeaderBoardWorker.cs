@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using StatisticalWorker.Service.Library;
 
 namespace StatisticalWorker.Workers
 {
@@ -15,13 +16,15 @@ namespace StatisticalWorker.Workers
         private Timer timer;
         private readonly SetLeaderBoardTableBLL setLeaderBoardTableBLL;
         private readonly ILogger<LeaderBoardWorker> logger;
+        private readonly Log2File log2File;
         #endregion
 
         #region - Construction method -
-        public LeaderBoardWorker(ILogger<LeaderBoardWorker> logger, SetLeaderBoardTableBLL setLeaderBoardTableBLL)
+        public LeaderBoardWorker(ILogger<LeaderBoardWorker> logger, SetLeaderBoardTableBLL setLeaderBoardTableBLL, Log2File log2File)
         {
             this.logger = logger;
             this.setLeaderBoardTableBLL = setLeaderBoardTableBLL;
+            this.log2File = log2File;
         }
         #endregion
 
@@ -45,12 +48,14 @@ namespace StatisticalWorker.Workers
 
             try
             {
+                log2File.Info(string.Format("LeaderBoardWorker-{0}", dtime.ToString("yyyy/MM/dd HH:mm:ss")), "LeaderBoardWorkerLog");
                 logger.LogInformation(string.Format("LeaderBoardWorker-{0}", dtime.ToString("yyyy/MM/dd HH:mm:ss")));
                 var LeaderBoardData = setLeaderBoardTableBLL.GetLeaderBoardData();              
                 setLeaderBoardTableBLL.SetLeaderBoardTable(LeaderBoardData);
             }
             catch(Exception ex)
             {
+                log2File.Info(ex.Message, "LeaderBoardWorkerLog");
                 logger.LogError(ex.Message);
             }
             finally

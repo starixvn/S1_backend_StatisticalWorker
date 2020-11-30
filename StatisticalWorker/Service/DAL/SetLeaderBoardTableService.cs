@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using StatisticalWorker.Service.Library;
 
 namespace StatisticalWorker.Service.DAL
 {
@@ -17,12 +18,14 @@ namespace StatisticalWorker.Service.DAL
         #region - property -
         private readonly ILogger<LeaderBoardWorker> logger;
         private readonly IConfiguration configuration;
+        private readonly Log2File log2File;
         #endregion
 
         #region - Construction method -
-        public SetLeaderBoardTableService(IConfiguration configuration)
+        public SetLeaderBoardTableService(IConfiguration configuration, Log2File log2File)
         {
             this.configuration = configuration;
+            this.log2File = log2File;
         }
         #endregion
 
@@ -43,6 +46,7 @@ namespace StatisticalWorker.Service.DAL
                 {
                     if (i == RtyTimes - 1)
                     {
+                        log2File.Info(string.Format("第{0}次執行-{1}", i + 1, ex.Message), "LeaderBoardWorkerLog");
                         logger.LogError(ex.Message);
                         break;
                     }
