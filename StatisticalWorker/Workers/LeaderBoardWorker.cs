@@ -37,8 +37,7 @@ namespace StatisticalWorker.Workers
         private void DoLeaderBoard(object state)
         {
             DateTime utcNow = DateTime.Now.ToUniversalTime();
-            double utc = ConvertDateTimeInt(utcNow);
-            DateTime dtime = ConvertIntDatetime(utc);
+            DateTime dtime = GetUTC8Time();
 
             //幾分的時候執行,一小內執行兩次
             int first = 1;
@@ -74,33 +73,14 @@ namespace StatisticalWorker.Workers
                     time = second - minute;
                 }
 
-                TimeSpan dueTimeSpan = TimeSpan.FromMinutes(minute);
+                TimeSpan dueTimeSpan = TimeSpan.FromMinutes(time);
                 timer.Change(dueTimeSpan, TimeSpan.Zero);
             }
         }
 
-        private int ConvertDateTimeInt(System.DateTime time)
+        private DateTime GetUTC8Time()
         {
-            double intResult = 0;
-
-            System.DateTime startTime = TimeZone.CurrentTimeZone.ToLocalTime(new System.DateTime(1970, 1, 1));
-
-            intResult = (time - startTime).TotalSeconds;
-
-            return (int)intResult;
-
-        }
-
-        private DateTime ConvertIntDatetime(double utc)
-        {
-            System.DateTime startTime = TimeZone.CurrentTimeZone.ToLocalTime(new System.DateTime(1970, 1, 1));
-
-            startTime = startTime.AddSeconds(utc);
-
-            startTime = startTime.AddHours(8);
-
-            return startTime;
-
+            return new DateTimeOffset(DateTime.Now).ToOffset(new TimeSpan(8, 0, 0)).DateTime;
         }
         #endregion
     }

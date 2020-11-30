@@ -36,10 +36,7 @@ namespace StatisticalWorker.Service.DAL
             {
                 try
                 {
-                    foreach (var leaderBoardData in LeaderBoardData)
-                    {
-                        conn.Execute("Service_Leaderboard_Set", leaderBoardData, commandType: CommandType.StoredProcedure);
-                    }
+                    conn.Execute("Service_Leaderboard_Set", LeaderBoardData, commandType: CommandType.StoredProcedure);
                     break;
                 }
                 catch (Exception ex)
