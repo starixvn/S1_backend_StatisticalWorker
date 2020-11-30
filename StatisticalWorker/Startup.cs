@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using StatisticalWorker.Service.BLL;
 using StatisticalWorker.Service.DAL;
+using StatisticalWorker.Service.Library;
 using StatisticalWorker.Workers;
 
 namespace StatisticalWorker
@@ -15,10 +16,14 @@ namespace StatisticalWorker
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<SetLeaderBoardTableBLL>();
+            //Library
+            services.AddSingleton<Log2File>();
 
             //DAL
             services.AddSingleton<SetLeaderBoardTableService>();
+
+            //BLL
+            services.AddSingleton<SetLeaderBoardTableBLL>();
 
             //Worker
             services.AddHostedService<LeaderBoardWorker>();

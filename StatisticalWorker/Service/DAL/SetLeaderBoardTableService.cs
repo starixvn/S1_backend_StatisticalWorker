@@ -52,7 +52,7 @@ namespace StatisticalWorker.Service.DAL
         public IEnumerable<LeaderBoardModel> GetLeaderBoardDataDll()
         {
             using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.Query<LeaderBoardModel>("Service_Leaderboard_Get", null, commandType: CommandType.StoredProcedure);
+            return conn.Query<LeaderBoardModel>("Service_Leaderboard_Get", commandType: CommandType.StoredProcedure);
         }
         #endregion
     }
