@@ -26,9 +26,9 @@ namespace StatisticalWorker.Service.BLL
             setLeaderBoardTableService.SetLeaderBoardTableDll(LeaderBoardData);
         }
 
-        public IEnumerable<LeaderBoardModel> GetLeaderBoardData()
+        public IEnumerable<LeaderBoardModel> GetLeaderBoardData(int is14)
         {
-            return setLeaderBoardTableService.GetLeaderBoardDataDll();
+            return setLeaderBoardTableService.GetLeaderBoardDataDll(is14);
         }
         #endregion
     }

@@ -34,7 +34,7 @@ namespace StatisticalWorker.Service.DAL
         {           
             //至多重新執行 N 次
             int RtyTimes = 2;
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStrings"));
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
             for(int i = 0; i < RtyTimes; ++i)
             {
                 try
@@ -53,10 +53,10 @@ namespace StatisticalWorker.Service.DAL
                 }
             }                      
         }
-        public IEnumerable<LeaderBoardModel> GetLeaderBoardDataDll()
+        public IEnumerable<LeaderBoardModel> GetLeaderBoardDataDll(int is14)
         {
             using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.Query<LeaderBoardModel>("Service_Leaderboard_Get", commandType: CommandType.StoredProcedure);
+            return conn.Query<LeaderBoardModel>("Service_Leaderboard_Get", new { Is14 = is14 }, commandType: CommandType.StoredProcedure);
         }
         #endregion
     }

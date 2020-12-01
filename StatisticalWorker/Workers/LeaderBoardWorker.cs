@@ -42,18 +42,31 @@ namespace StatisticalWorker.Workers
             DateTime utcNow = DateTime.Now.ToUniversalTime();
             DateTime dtime = GetUTC8Time();
 
-            //幾分的時候執行,一小內執行兩次
-            int first = 1;
-            int second = 31;
-
             try
             {
                 log2File.Info(string.Format("LeaderBoardWorker-{0}", dtime.ToString("yyyy/MM/dd HH:mm:ss")), "LeaderBoardWorkerLog");
                 logger.LogInformation(string.Format("LeaderBoardWorker-{0}", dtime.ToString("yyyy/MM/dd HH:mm:ss")));
-                var LeaderBoardData = setLeaderBoardTableBLL.GetLeaderBoardData();              
-                setLeaderBoardTableBLL.SetLeaderBoardTable(LeaderBoardData);
+
+                var leaderBoardDataList = setLeaderBoardTableBLL.GetLeaderBoardData(0).ToList();
+
+                var dd = leaderBoardDataList.ToDictionary(x => $"{x.LBCategoryId}_{x.CustId}", x => x);
+
+                    foreach (var leaderBoardDataList14 in setLeaderBoardTableBLL.GetLeaderBoardData(1))
+                    {
+                        if (dd.ContainsKey($"{leaderBoardDataList14.LBCategoryId}_{leaderBoardDataList14.CustId}"))
+                        {
+                            dd[$"{leaderBoardDataList14.LBCategoryId}_{leaderBoardDataList14.CustId}"].Turnover += leaderBoardDataList14.Turnover;
+                        }
+                        else
+                        {
+                            leaderBoardDataList.Add(leaderBoardDataList14);
+                        }
+                    }
+             
+
+                setLeaderBoardTableBLL.SetLeaderBoardTable(leaderBoardDataList);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 log2File.Info(ex.Message, "LeaderBoardWorkerLog");
                 logger.LogError(ex.Message);
@@ -61,24 +74,13 @@ namespace StatisticalWorker.Workers
             finally
             {
                 //下一次還要多久分鐘後執行
-                int time = 0;
-                //現在幾分
-                int minute = DateTime.Now.Minute;
+                int nextTime = 60;
+                int nowMinute = GetUTC8Time().Minute;
 
-                if(second < minute)
-                {
-                    time = 60 - minute + first;
-                }
-                else if(first > minute)
-                {
-                    time = first - minute;
-                }
-                else
-                {
-                    time = second - minute;
-                }
-
-                TimeSpan dueTimeSpan = TimeSpan.FromMinutes(time);
+                nextTime = nextTime - nowMinute + 1;
+                if (nextTime > 30)
+                    nextTime -= 30;
+                TimeSpan dueTimeSpan = TimeSpan.FromMinutes(nextTime);
                 timer.Change(dueTimeSpan, TimeSpan.Zero);
             }
         }
