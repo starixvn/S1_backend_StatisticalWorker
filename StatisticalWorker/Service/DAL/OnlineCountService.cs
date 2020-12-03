@@ -13,16 +13,16 @@ using System.Threading.Tasks;
 
 namespace StatisticalWorker.Service.DAL
 {
-    public class OnlinePopulationService
+    public class OnlineCountService
     {
         #region - property -
-        private readonly ILogger<OnlinePopulationWorker> logger;
+        private readonly ILogger<OnlineCountWorker> logger;
         private readonly IConfiguration configuration;
         private readonly Log2File log2File;
         #endregion
 
         #region - Construction method -
-        public OnlinePopulationService(IConfiguration configuration, Log2File log2File)
+        public OnlineCountService(IConfiguration configuration, Log2File log2File)
         {
             this.configuration = configuration;
             this.log2File = log2File;
@@ -30,17 +30,16 @@ namespace StatisticalWorker.Service.DAL
         #endregion
 
         #region - method -
-        public IEnumerable<OnlinePopulationModel> GetOnlinePopulationData(DateTime RecordTime)
+        public IEnumerable<OnlineCountModel> GetOnlineOnlineUsersData()
         {
-            var EndTime = RecordTime.AddMinutes(-10);
             using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.Query<OnlinePopulationModel>("Service_OnlineAmung_Get", new { SYSStartDate = RecordTime, SYSEndDate = EndTime }, commandType: CommandType.StoredProcedure);
+            return conn.Query<OnlineCountModel>("Service_OnlineUsers_Get", commandType: CommandType.StoredProcedure);
         }
 
-        public void SetOnlinePopulationData(IEnumerable<OnlinePopulationModel> para)
+        public void SetOnlineCountData(IEnumerable<OnlineCountModel> para)
         {
             using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            conn.Execute("Service_OnlinePopulation_Set", para, commandType: CommandType.StoredProcedure);
+            conn.Execute("Service_OnlineCount_Set", para, commandType: CommandType.StoredProcedure);
         }
         #endregion
     }

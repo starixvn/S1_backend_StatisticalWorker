@@ -11,17 +11,17 @@ using System.Threading.Tasks;
 
 namespace StatisticalWorker.Workers
 {
-    public class OnlinePopulationWorker : BackgroundService
+    public class OnlineCountWorker : BackgroundService
     {
         #region - property -
         private Timer timer;
-        private readonly OnlinePopulationBLL onlinePopulationBLL;
+        private readonly OnlineCountBLL onlinePopulationBLL;
         private readonly ILogger<LeaderBoardWorker> logger;
         private readonly Log2File log2File;
         #endregion
 
         #region - Construction method -
-        public OnlinePopulationWorker(ILogger<LeaderBoardWorker> logger, OnlinePopulationBLL onlinePopulationBLL, Log2File log2File)
+        public OnlineCountWorker(ILogger<LeaderBoardWorker> logger, OnlineCountBLL onlinePopulationBLL, Log2File log2File)
         {
             this.logger = logger;
             this.onlinePopulationBLL = onlinePopulationBLL;
@@ -32,25 +32,21 @@ namespace StatisticalWorker.Workers
         #region - protected method- 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            timer = new Timer(SetOnlinePopulation, null, TimeSpan.Zero, TimeSpan.Zero);
+            timer = new Timer(SetOnlineCount, null, TimeSpan.Zero, TimeSpan.Zero);
             return Task.CompletedTask;
         }
         #endregion
 
         #region - private method - 
-        private void SetOnlinePopulation(object state)
+        private void SetOnlineCount(object state)
         {
             DateTime dtime = GetUTC8Time();
             try
             {
                 log2File.Info(string.Format("OnlinePopulationWorker-{0}", dtime.ToString("yyyy/MM/dd HH:mm:ss")), "OnlinePopulationWorkerLog");
                 logger.LogInformation(string.Format("OnlinePopulationWorker-{0}", dtime.ToString("yyyy/MM/dd HH:mm:ss")));
-                var onlinePopulationData = onlinePopulationBLL.GetOnlinePopulationData(dtime);
-                foreach(var x in onlinePopulationData)
-                {
-                    x.CreateTime = dtime;
-                }
-                onlinePopulationBLL.SetOnlinePopulationData(onlinePopulationData);
+                var onlineCountData = onlinePopulationBLL.GetOnlineOnlineUsersData();
+                onlinePopulationBLL.SetOnlineCountData(onlineCountData);
             }
             catch (Exception ex)
             {

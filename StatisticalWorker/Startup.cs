@@ -22,15 +22,15 @@ namespace StatisticalWorker
 
             //DAL
             services.AddSingleton<SetLeaderBoardTableService>();
-            services.AddSingleton<OnlinePopulationService>();
+            services.AddSingleton<OnlineCountService>();
 
             //BLL
             services.AddSingleton<SetLeaderBoardTableBLL>();
-            services.AddSingleton<OnlinePopulationBLL>();
+            services.AddSingleton<OnlineCountBLL>();
 
             //Worker
             services.AddHostedService<LeaderBoardWorker>();
-            services.AddHostedService<OnlinePopulationWorker>();
+            services.AddHostedService<OnlineCountWorker>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
