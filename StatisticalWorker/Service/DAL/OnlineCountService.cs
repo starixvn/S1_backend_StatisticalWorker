@@ -16,16 +16,13 @@ namespace StatisticalWorker.Service.DAL
     public class OnlineCountService
     {
         #region - property -
-        private readonly ILogger<OnlineCountWorker> logger;
         private readonly IConfiguration configuration;
-        private readonly Log2File log2File;
         #endregion
 
         #region - Construction method -
-        public OnlineCountService(IConfiguration configuration, Log2File log2File)
+        public OnlineCountService(IConfiguration configuration)
         {
             this.configuration = configuration;
-            this.log2File = log2File;
         }
         #endregion
 

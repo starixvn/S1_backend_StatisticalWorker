@@ -22,20 +22,21 @@ namespace StatisticalWorker.Service.DAL
         #endregion
 
         #region - Construction method -
-        public SetLeaderBoardTableService(IConfiguration configuration, Log2File log2File)
+        public SetLeaderBoardTableService(IConfiguration configuration, ILogger<LeaderBoardWorker> logger, Log2File log2File)
         {
             this.configuration = configuration;
             this.log2File = log2File;
+            this.logger = logger;
         }
         #endregion
 
         #region - method -
         public void SetLeaderBoardTableDll(IEnumerable<LeaderBoardModel> LeaderBoardData)
-        {           
+        {
             //至多重新執行 N 次
             int RtyTimes = 2;
             using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            for(int i = 0; i < RtyTimes; ++i)
+            for (int i = 0; i < RtyTimes; ++i)
             {
                 try
                 {
@@ -46,12 +47,12 @@ namespace StatisticalWorker.Service.DAL
                 {
                     if (i == RtyTimes - 1)
                     {
-                        log2File.Info(string.Format("第{0}次執行-{1}", i + 1, ex.Message), "LeaderBoardWorkerLog");
+                        log2File.Error($"{i + 1} Time\r\n{ex}", "LeaderBoardWorkerLog");
                         logger.LogError(ex.Message);
                         break;
                     }
                 }
-            }                      
+            }
         }
         public IEnumerable<LeaderBoardModel> GetLeaderBoardDataDll(int is14)
         {
