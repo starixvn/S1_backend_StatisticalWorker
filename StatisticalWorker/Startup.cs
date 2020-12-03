@@ -16,17 +16,21 @@ namespace StatisticalWorker
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+
             //Library
             services.AddSingleton<Log2File>();
 
             //DAL
             services.AddSingleton<SetLeaderBoardTableService>();
+            services.AddSingleton<OnlinePopulationService>();
 
             //BLL
             services.AddSingleton<SetLeaderBoardTableBLL>();
+            services.AddSingleton<OnlinePopulationBLL>();
 
             //Worker
             services.AddHostedService<LeaderBoardWorker>();
+            services.AddHostedService<OnlinePopulationWorker>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
