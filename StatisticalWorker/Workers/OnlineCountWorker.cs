@@ -16,12 +16,12 @@ namespace StatisticalWorker.Workers
         #region - property -
         private Timer timer;
         private readonly OnlineCountBLL onlinePopulationBLL;
-        private readonly ILogger<LeaderBoardWorker> logger;
+        private readonly ILogger<OnlineCountWorker> logger;
         private readonly Log2File log2File;
         #endregion
 
         #region - Construction method -
-        public OnlineCountWorker(ILogger<LeaderBoardWorker> logger, OnlineCountBLL onlinePopulationBLL, Log2File log2File)
+        public OnlineCountWorker(ILogger<OnlineCountWorker> logger, OnlineCountBLL onlinePopulationBLL, Log2File log2File)
         {
             this.logger = logger;
             this.onlinePopulationBLL = onlinePopulationBLL;
