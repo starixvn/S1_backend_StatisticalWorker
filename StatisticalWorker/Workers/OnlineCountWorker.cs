@@ -43,8 +43,8 @@ namespace StatisticalWorker.Workers
             DateTime dtime = GetUTC8Time();
             try
             {
-                log2File.Info(string.Format("OnlinePopulationWorker-{0}", dtime.ToString("yyyy/MM/dd HH:mm:ss")), "OnlinePopulationWorkerLog");
-                logger.LogInformation(string.Format("OnlinePopulationWorker-{0}", dtime.ToString("yyyy/MM/dd HH:mm:ss")));
+                log2File.Info(string.Format("OnlineCountWorker-{0}", dtime.ToString("yyyy/MM/dd HH:mm:ss")), "OnlineCountWorker");
+                logger.LogInformation(string.Format("OnlineCountWorker-{0}", dtime.ToString("yyyy/MM/dd HH:mm:ss")));
                 var onlineCountData = onlinePopulationBLL.GetOnlineOnlineUsersData();
                 onlinePopulationBLL.SetOnlineCountData(onlineCountData);
             }
