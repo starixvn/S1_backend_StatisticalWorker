@@ -59,6 +59,19 @@ namespace StatisticalWorker.Service.DAL
             using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             return conn.Query<LeaderBoardModel>("Service_Leaderboard_Get", new { Is14 = is14 }, commandType: CommandType.StoredProcedure);
         }
+
+        public void SetLeaderBoardDepositDll(IEnumerable<DepositModel> DepositData)
+        {
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            conn.Execute("Service_LeaderboardDeposit_Set", DepositData, commandType: CommandType.StoredProcedure);
+        }
+
+        public IEnumerable<DepositModel> GetLeaderBoardDepositDll()
+        {
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            return conn.Query<DepositModel>("Service_LeaderboardDeposit_Get", null, commandType: CommandType.StoredProcedure);
+        }
+
         #endregion
     }
 }
