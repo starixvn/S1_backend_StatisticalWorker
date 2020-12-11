@@ -30,6 +30,16 @@ namespace StatisticalWorker.Service.BLL
         {
             return setLeaderBoardTableService.GetLeaderBoardDataDll(is14);
         }
+
+        public void SetLeaderBoardDeposit(IEnumerable<DepositModel> DepositData)
+        {
+            setLeaderBoardTableService.SetLeaderBoardDepositDll(DepositData);
+        }
+
+        public IEnumerable<DepositModel> GetLeaderBoardDeposit()
+        {
+            return setLeaderBoardTableService.GetLeaderBoardDepositDll();
+        }
         #endregion
     }
 }

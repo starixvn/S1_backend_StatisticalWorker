@@ -13,7 +13,8 @@ namespace StatisticalWorker.Workers
     public class LeaderBoardWorker : BackgroundService
     {
         #region - property -
-        private Timer timer;
+        private Timer doLeaderBoard;
+        private Timer setLeaderBoardDeposit;
         private readonly SetLeaderBoardTableBLL setLeaderBoardTableBLL;
         private readonly ILogger<LeaderBoardWorker> logger;
         private readonly Log2File log2File;
@@ -31,7 +32,9 @@ namespace StatisticalWorker.Workers
         #region - protected method- 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            timer = new Timer(DoLeaderBoard, null, TimeSpan.Zero, TimeSpan.Zero);
+            doLeaderBoard = new Timer(DoLeaderBoard, null, TimeSpan.Zero, TimeSpan.Zero);
+            setLeaderBoardDeposit = new Timer(SetLeaderBoardDeposit, null, TimeSpan.Zero, TimeSpan.Zero);
+
             return Task.CompletedTask;
         }
         #endregion
@@ -49,13 +52,13 @@ namespace StatisticalWorker.Workers
 
                 var leaderBoardDataList = setLeaderBoardTableBLL.GetLeaderBoardData(0).ToList();
 
-                var dd = leaderBoardDataList.ToDictionary(x => $"{x.LBCategoryId}_{x.CustId}", x => x);
+                var dd = leaderBoardDataList.ToDictionary(x => $"{x.CategoryId}_{x.CustId}", x => x);
 
                     foreach (var leaderBoardDataList14 in setLeaderBoardTableBLL.GetLeaderBoardData(1))
                     {
-                        if (dd.ContainsKey($"{leaderBoardDataList14.LBCategoryId}_{leaderBoardDataList14.CustId}"))
+                        if (dd.ContainsKey($"{leaderBoardDataList14.CategoryId}_{leaderBoardDataList14.CustId}"))
                         {
-                            dd[$"{leaderBoardDataList14.LBCategoryId}_{leaderBoardDataList14.CustId}"].Turnover += leaderBoardDataList14.Turnover;
+                            dd[$"{leaderBoardDataList14.CategoryId}_{leaderBoardDataList14.CustId}"].Turnover += leaderBoardDataList14.Turnover;
                         }
                         else
                         {
@@ -81,7 +84,39 @@ namespace StatisticalWorker.Workers
                 if (nextTime > 30)
                     nextTime -= 30;
                 TimeSpan dueTimeSpan = TimeSpan.FromMinutes(nextTime);
-                timer.Change(dueTimeSpan, TimeSpan.Zero);
+                doLeaderBoard.Change(dueTimeSpan, TimeSpan.Zero);
+            }
+        }
+
+        private void SetLeaderBoardDeposit(object state)
+         {
+            DateTime utcNow = DateTime.Now.ToUniversalTime();
+            DateTime dtime = GetUTC8Time();
+
+            try
+            {
+                log2File.Info(string.Format("SetLeaderBoardDeposit-{0}", dtime.ToString("yyyy/MM/dd HH:mm:ss")), "SetLeaderBoardDepositLog");
+                logger.LogInformation(string.Format("SetLeaderBoardDeposit-{0}", dtime.ToString("yyyy/MM/dd HH:mm:ss")));
+
+                var DepositList = setLeaderBoardTableBLL.GetLeaderBoardDeposit();
+                setLeaderBoardTableBLL.SetLeaderBoardDeposit(DepositList);
+            }
+            catch (Exception ex)
+            {
+                log2File.Info(ex.Message, "SetLeaderBoardDepositLog");
+                logger.LogError(ex.Message);
+            }
+            finally
+            {
+                //下一次還要多久分鐘後執行
+                int nextTime = 60;
+                int nowMinute = GetUTC8Time().Minute;
+
+                nextTime = nextTime - nowMinute + 1;
+                if (nextTime > 30)
+                    nextTime -= 30;
+                TimeSpan dueTimeSpan = TimeSpan.FromMinutes(nextTime);
+                setLeaderBoardDeposit.Change(dueTimeSpan, TimeSpan.Zero);
             }
         }
 
