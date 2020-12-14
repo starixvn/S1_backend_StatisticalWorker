@@ -26,9 +26,14 @@ namespace StatisticalWorker.Service.BLL
             setLeaderBoardTableService.SetLeaderBoardTableDll(LeaderBoardData);
         }
 
-        public IEnumerable<LeaderBoardModel> GetLeaderBoardData(int is14)
+        public IEnumerable<LeaderBoardModel> GetN88LeaderBoardData(int is14)
         {
-            return setLeaderBoardTableService.GetLeaderBoardDataDll(is14);
+            return setLeaderBoardTableService.GetN88LeaderBoardDataDll(is14);
+        }
+
+        public IEnumerable<LeaderBoardModel> GetBGLeaderBoardData(int is14)
+        {
+            return setLeaderBoardTableService.GetBGLeaderBoardDataDll(is14);
         }
 
         public void SetLeaderBoardDeposit(IEnumerable<DepositModel> DepositData)
@@ -36,9 +41,14 @@ namespace StatisticalWorker.Service.BLL
             setLeaderBoardTableService.SetLeaderBoardDepositDll(DepositData);
         }
 
-        public IEnumerable<DepositModel> GetLeaderBoardDeposit()
+        public IEnumerable<DepositModel> GetN88LeaderBoardDeposit()
         {
-            return setLeaderBoardTableService.GetLeaderBoardDepositDll();
+            return setLeaderBoardTableService.GetN88LeaderBoardDepositDll();
+        }
+
+        public IEnumerable<DepositModel> GetBGLeaderBoardDeposit()
+        {
+            return setLeaderBoardTableService.GetBGLeaderBoardDepositDll();
         }
         #endregion
     }

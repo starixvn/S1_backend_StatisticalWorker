@@ -54,10 +54,16 @@ namespace StatisticalWorker.Service.DAL
                 }
             }
         }
-        public IEnumerable<LeaderBoardModel> GetLeaderBoardDataDll(int is14)
+        public IEnumerable<LeaderBoardModel> GetN88LeaderBoardDataDll(int is14)
         {
             using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.Query<LeaderBoardModel>("Service_Leaderboard_Get", new { Is14 = is14 }, commandType: CommandType.StoredProcedure);
+            return conn.Query<LeaderBoardModel>("Service_Leaderboard_N88Get", new { Is14 = is14 }, commandType: CommandType.StoredProcedure);
+        }
+
+        public IEnumerable<LeaderBoardModel> GetBGLeaderBoardDataDll(int is14)
+        {
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            return conn.Query<LeaderBoardModel>("Service_Leaderboard_BGGet", new { Is14 = is14 }, commandType: CommandType.StoredProcedure);
         }
 
         public void SetLeaderBoardDepositDll(IEnumerable<DepositModel> DepositData)
@@ -66,10 +72,16 @@ namespace StatisticalWorker.Service.DAL
             conn.Execute("Service_LeaderboardDeposit_Set", DepositData, commandType: CommandType.StoredProcedure);
         }
 
-        public IEnumerable<DepositModel> GetLeaderBoardDepositDll()
+        public IEnumerable<DepositModel> GetN88LeaderBoardDepositDll()
         {
             using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.Query<DepositModel>("Service_LeaderboardDeposit_Get", null, commandType: CommandType.StoredProcedure);
+            return conn.Query<DepositModel>("Service_LeaderboardDeposit_N88Get", null, commandType: CommandType.StoredProcedure);
+        }
+
+        public IEnumerable<DepositModel> GetBGLeaderBoardDepositDll()
+        {
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            return conn.Query<DepositModel>("Service_LeaderboardDeposit_BGGet", null, commandType: CommandType.StoredProcedure);
         }
 
         #endregion
