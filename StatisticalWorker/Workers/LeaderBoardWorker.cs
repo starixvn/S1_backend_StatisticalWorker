@@ -75,7 +75,7 @@ namespace StatisticalWorker.Workers
             }
             catch (Exception ex)
             {
-                log2File.Info(ex.Message, "N88LeaderBoardWorkerLog");
+                log2File.Error(ex.ToString(), "N88LeaderBoardWorkerLog");
                 logger.LogError(ex.Message);
             }
             finally

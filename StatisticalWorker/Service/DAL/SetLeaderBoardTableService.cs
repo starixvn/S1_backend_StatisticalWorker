@@ -57,13 +57,13 @@ namespace StatisticalWorker.Service.DAL
         public IEnumerable<LeaderBoardModel> GetN88LeaderBoardDataDll(int is14)
         {
             using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.Query<LeaderBoardModel>("Service_Leaderboard_N88Get", new { Is14 = is14 }, commandType: CommandType.StoredProcedure);
+            return conn.Query<LeaderBoardModel>("Service_Leaderboard_N88Get", new { Is14 = is14 }, commandTimeout: 180, commandType: CommandType.StoredProcedure);
         }
 
         public IEnumerable<LeaderBoardModel> GetBGLeaderBoardDataDll(int is14)
         {
             using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.Query<LeaderBoardModel>("Service_Leaderboard_BGGet", new { Is14 = is14 }, commandType: CommandType.StoredProcedure);
+            return conn.Query<LeaderBoardModel>("Service_Leaderboard_BGGet", new { Is14 = is14 }, commandTimeout: 180, commandType: CommandType.StoredProcedure);
         }
 
         public void SetLeaderBoardDepositDll(IEnumerable<DepositModel> DepositData)
