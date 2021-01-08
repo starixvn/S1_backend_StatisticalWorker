@@ -58,18 +58,18 @@ namespace StatisticalWorker.Workers
 
                 var dd = leaderBoardDataList.ToDictionary(x => $"{x.CategoryId}_{x.CustId}", x => x);
 
-                    foreach (var leaderBoardDataList14 in setLeaderBoardTableBLL.GetN88LeaderBoardData(1))
+                foreach (var leaderBoardDataList14 in setLeaderBoardTableBLL.GetN88LeaderBoardData(1))
+                {
+                    if (dd.ContainsKey($"{leaderBoardDataList14.CategoryId}_{leaderBoardDataList14.CustId}"))
                     {
-                        if (dd.ContainsKey($"{leaderBoardDataList14.CategoryId}_{leaderBoardDataList14.CustId}"))
-                        {
-                            dd[$"{leaderBoardDataList14.CategoryId}_{leaderBoardDataList14.CustId}"].Turnover += leaderBoardDataList14.Turnover;
-                        }
-                        else
-                        {
-                            leaderBoardDataList.Add(leaderBoardDataList14);
-                        }
+                        dd[$"{leaderBoardDataList14.CategoryId}_{leaderBoardDataList14.CustId}"].Turnover += leaderBoardDataList14.Turnover;
+                        dd[$"{leaderBoardDataList14.CategoryId}_{leaderBoardDataList14.CustId}"].WinlostAmount += leaderBoardDataList14.WinlostAmount;
                     }
-             
+                    else
+                    {
+                        leaderBoardDataList.Add(leaderBoardDataList14);
+                    }
+                }
 
                 setLeaderBoardTableBLL.SetLeaderBoardTable(leaderBoardDataList);
             }
@@ -111,6 +111,7 @@ namespace StatisticalWorker.Workers
                     if (dd.ContainsKey($"{leaderBoardDataList14.CategoryId}_{leaderBoardDataList14.CustId}"))
                     {
                         dd[$"{leaderBoardDataList14.CategoryId}_{leaderBoardDataList14.CustId}"].Turnover += leaderBoardDataList14.Turnover;
+                        dd[$"{leaderBoardDataList14.CategoryId}_{leaderBoardDataList14.CustId}"].WinlostAmount += leaderBoardDataList14.WinlostAmount;
                     }
                     else
                     {
@@ -141,7 +142,7 @@ namespace StatisticalWorker.Workers
         }
 
         private void SetN88LeaderBoardDeposit(object state)
-         {
+        {
             DateTime utcNow = DateTime.Now.ToUniversalTime();
             DateTime dtime = GetUTC8Time();
 
