@@ -38,7 +38,7 @@ namespace StatisticalWorker.Service.BLL
 
         public void SetLeaderBoardDeposit(IEnumerable<DepositModel> DepositData)
         {
-            setLeaderBoardTableService.SetLeaderBoardDepositDll(DepositData);
+           setLeaderBoardTableService.SetLeaderBoardDepositDll(DepositData);
         }
 
         public IEnumerable<DepositModel> GetN88LeaderBoardDeposit()
