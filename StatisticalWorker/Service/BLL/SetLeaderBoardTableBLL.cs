@@ -50,6 +50,22 @@ namespace StatisticalWorker.Service.BLL
         {
             return setLeaderBoardTableService.GetBGLeaderBoardDepositDll();
         }
+        public void SetLeaderBoardTableV2(IEnumerable<LeaderBoardModelV2> leaderBoardData)
+        {
+            setLeaderBoardTableService.SetLeaderBoardTableV2(leaderBoardData);
+        }
+        public IEnumerable<LeaderBoardModelV2> GetLeaderBoardDataV2(int is14, int siteId, string eventCode, string startDate, string endDate, string timeZone, string sPName)
+        {
+            return setLeaderBoardTableService.GetLeaderBoardDataV2(is14, siteId, eventCode, startDate, endDate, timeZone, sPName);
+        }
+        public IEnumerable<LeaderBoardEvent> GetLeaderboardEvent()
+        {
+            return setLeaderBoardTableService.GetLeaderboardEvent();
+        }
+        public void CheckLeaderboardOverTime()
+        {
+            setLeaderBoardTableService.CheckLeaderboardOverTime();
+        }
         #endregion
     }
 }

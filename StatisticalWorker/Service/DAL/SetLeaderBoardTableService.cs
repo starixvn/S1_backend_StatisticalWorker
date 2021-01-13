@@ -84,6 +84,44 @@ namespace StatisticalWorker.Service.DAL
             return conn.Query<DepositModel>("Service_LeaderboardDeposit_BGGet", null, commandType: CommandType.StoredProcedure);
         }
 
+        public void SetLeaderBoardTableV2(IEnumerable<LeaderBoardModelV2> LeaderBoardData)
+        {
+            //至多重新執行 N 次
+            int RtyTimes = 2;
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            for (int i = 0; i < RtyTimes; ++i)
+            {
+                try
+                {
+                    conn.Execute("Service_LeaderboardV2_Set", LeaderBoardData, commandType: CommandType.StoredProcedure);
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    if (i == RtyTimes - 1)
+                    {
+                        log2File.Error($"{i + 1} Time\r\n{ex}", "LeaderBoardWorkerV2Log");
+                        logger.LogError(ex.Message);
+                        break;
+                    }
+                }
+            }
+        }
+        public IEnumerable<LeaderBoardModelV2> GetLeaderBoardDataV2(int is14, int siteId, string eventCode, string startDate, string endDate, string timeZone, string sPName)
+        {
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            return conn.Query<LeaderBoardModelV2>(sPName, new { SiteId = siteId, EventCode = eventCode, StartDate = startDate, EndDate = endDate, TimeZone = timeZone, Is14 = is14 }, commandType: CommandType.StoredProcedure);
+        }
+        public IEnumerable<LeaderBoardEvent> GetLeaderboardEvent()
+        {
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            return conn.Query<LeaderBoardEvent>("Service_LeaderboardEvent_Get", commandType: CommandType.StoredProcedure);
+        }
+        public void CheckLeaderboardOverTime()
+        {
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            conn.Execute("Service_LeaderboardOverTime_Set", commandType: CommandType.StoredProcedure);
+        }
         #endregion
     }
 }
