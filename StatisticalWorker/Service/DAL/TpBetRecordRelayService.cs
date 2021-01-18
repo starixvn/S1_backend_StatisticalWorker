@@ -53,6 +53,7 @@ namespace StatisticalWorker.Service.DAL
                 conn.Execute(SpName, parameters, commandType: CommandType.StoredProcedure);
 
                 totalCount = parameters.Get<int?>("TotalCount") ?? 0;
+
                 return totalCount;
             }
         }
