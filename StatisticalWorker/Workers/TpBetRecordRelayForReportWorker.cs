@@ -81,7 +81,7 @@ namespace StatisticalWorker.Workers
                         _log2File.Info($"TpBetRecordRelayForReportWorker-{GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss")}  Run Start.", "TpBetRecordRelayForReportWorker");
                         _logger.LogInformation($"TpBetRecordRelayForReportWorker-{GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss")}  Run Start.");
 
-                        while (GetUTC8Time() >= startTime && GetUTC8Time() <= endTime)
+                        if (GetUTC8Time() >= startTime && GetUTC8Time() <= endTime)
                         {
                             #region CheckParameter
 
@@ -113,7 +113,7 @@ namespace StatisticalWorker.Workers
 
                             processDate = today;
 
-                            Thread.Sleep(_configuration.GetValue<int>("DGArchiveCFG:ColdDownTime") * 1000);
+                            Thread.Sleep(_configuration.GetValue<int>("TpBetRecordRelayParam:ColdDownTime") * 1000);
                         }
                     }
                 }
@@ -177,7 +177,7 @@ namespace StatisticalWorker.Workers
 
                 if (String.IsNullOrEmpty(sDate))
                 {
-                    startDate = DateTime.Today.ToString("yyyy-MM-dd");
+                    startDate = DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd");
                 }
                 else
                 {
@@ -186,7 +186,7 @@ namespace StatisticalWorker.Workers
 
                 if (String.IsNullOrEmpty(eDate))
                 {
-                    endDate = DateTime.Today.AddDays(-15).ToString("yyyy-MM-dd");
+                    endDate = DateTime.Today.AddDays(-14).ToString("yyyy-MM-dd");
                 }
                 else
                 {
