@@ -38,7 +38,7 @@ namespace StatisticalWorker.Service.DAL
         {
             int totalCount = 0;
 
-            using (MySqlConnection conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport")))
+            using (MySqlConnection conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString")))
             {
                 var parameters = new DynamicParameters(
                 new
