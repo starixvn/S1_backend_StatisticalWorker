@@ -38,7 +38,7 @@ namespace StatisticalWorker.Service.DAL
         {
             int totalCount = 0;
 
-            using (MySqlConnection conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionStringReport")))
+            using (MySqlConnection conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString")))
             {
                 var parameters = new DynamicParameters(
                 new
@@ -49,7 +49,7 @@ namespace StatisticalWorker.Service.DAL
                 });
                 parameters.Add("TotalCount", totalCount, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
 
-                string SpName = "Relay_Report_TpBetRecord_Set";
+                string SpName = "Relay_TpBetRecord_Set";
                 conn.Execute(SpName, parameters, commandType: CommandType.StoredProcedure);
 
                 totalCount = parameters.Get<int?>("TotalCount") ?? 0;
