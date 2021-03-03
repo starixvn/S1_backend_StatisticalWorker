@@ -81,31 +81,31 @@ namespace StatisticalWorker.Workers
                         _log2File.Info($"TpBetRecordRelayForReportWorker-{GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss")}  Run Start.", "TpBetRecordRelayForReportWorker");
                         _logger.LogInformation($"TpBetRecordRelayForReportWorker-{GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss")}  Run Start.");
 
-                        while (GetUTC8Time() >= startTime && GetUTC8Time() <= endTime)
+                        if (GetUTC8Time() >= startTime && GetUTC8Time() <= endTime)
                         {
-                            #region CheckParameter
+                            //#region CheckParameter
 
-                            if (!CheckParameter(false,
-                                           _configuration.GetValue<string>("TpBetRecordRelayParam:StartDate"),
-                                           _configuration.GetValue<string>("TpBetRecordRelayParam:EndDate"),
-                                           out bool table,
-                                           out string startDate,
-                                           out string endDate))
-                            {
-                                _log2File.Info(string.Format("TpBetRecordRelayForReportWorker-{0} Parameter Check Fail. ", GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss")), "TpBetRecordRelayForReportWorker");
-                                _logger.LogInformation(string.Format("TpBetRecordRelayForReportWorker-{0}  Parameter Check Fail.", GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss")));
+                            //if (!CheckParameter(false,
+                            //               _configuration.GetValue<string>("TpBetRecordRelayParam:StartDate"),
+                            //               _configuration.GetValue<string>("TpBetRecordRelayParam:EndDate"),
+                            //               out bool table,
+                            //               out string startDate,
+                            //               out string endDate))
+                            //{
+                            //    _log2File.Info(string.Format("TpBetRecordRelayForReportWorker-{0} Parameter Check Fail. ", GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss")), "TpBetRecordRelayForReportWorker");
+                            //    _logger.LogInformation(string.Format("TpBetRecordRelayForReportWorker-{0}  Parameter Check Fail.", GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss")));
 
-                                return;
-                            }
+                            //    return;
+                            //}
 
-                            #endregion
+                            //#endregion
 
                             int totalCount = _tpBetRecordRelayBLL.SetTpBetRecordRelayForReport(
                                              new TpBetRecordRelayForReportParameterModel()
                                              {
-                                                 Table = table,
-                                                 StartDate = startDate,
-                                                 EndDate = endDate
+                                                 Table = false,
+                                                 StartDate = string.Empty,
+                                                 EndDate = string.Empty
                                              });
 
                             _log2File.Info(string.Format("TpBetRecordRelayForReportWorker-{0} Run Success. Affected Count:{1}", GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss"), totalCount), "TpBetRecordRelayForReportWorker");
@@ -113,7 +113,7 @@ namespace StatisticalWorker.Workers
 
                             processDate = today;
 
-                            Thread.Sleep(_configuration.GetValue<int>("DGArchiveCFG:ColdDownTime") * 1000);
+                            Thread.Sleep(_configuration.GetValue<int>("TpBetRecordRelayParam:ColdDownTime") * 1000);
                         }
                     }
                 }
@@ -177,7 +177,7 @@ namespace StatisticalWorker.Workers
 
                 if (String.IsNullOrEmpty(sDate))
                 {
-                    startDate = DateTime.Today.ToString("yyyy-MM-dd");
+                    startDate = DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd");
                 }
                 else
                 {
@@ -186,7 +186,7 @@ namespace StatisticalWorker.Workers
 
                 if (String.IsNullOrEmpty(eDate))
                 {
-                    endDate = DateTime.Today.AddDays(-15).ToString("yyyy-MM-dd");
+                    endDate = DateTime.Today.AddDays(-14).ToString("yyyy-MM-dd");
                 }
                 else
                 {
