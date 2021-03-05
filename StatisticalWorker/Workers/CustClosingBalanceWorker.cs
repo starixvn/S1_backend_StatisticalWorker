@@ -69,6 +69,7 @@ namespace StatisticalWorker.Workers
 
             DateTime? beginAt = null;
             string today = string.Empty;
+            string runTime = GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss");
 
             int? siteId = null;
             int? timeZone = null;
@@ -81,6 +82,9 @@ namespace StatisticalWorker.Workers
 
             try
             {
+                _log2File.Info($"CustClosingBalanceWorker-Run Start At Time(UTC+8)={runTime}.", "CustClosingBalanceWorker");
+                _logger.LogInformation($"CustClosingBalanceWorker-Run Start At Time(UTC+8)={runTime}.");
+
                 #region CheckParameter
 
                 for (int i = 1; i <= 3 && flag==false ; i++)
@@ -119,23 +123,28 @@ namespace StatisticalWorker.Workers
                             break;
                     }
 
+                    #region Get BeginAt
+
                     beginAt = timeZone != null ? GetUTCTimeByTimeZone((int)timeZone) : null;
                     if (beginAt == null)
                     {
                         string siteName = GetSiteName(siteId);
 
-                        _log2File.Info($"CustClosingBalanceWorker-SiteId={siteId}，SiteName={siteName}，TimeZone={timeZone}，BeginAt(UTC+8)={GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss")}", "CustClosingBalanceWorker");
-                        _logger.LogInformation($"{beginAt:yyyy/MM/dd} {startTime} - {beginAt:yyyy/MM/dd} {endTime}");
+                        _log2File.Error($"CustClosingBalanceWorker-Check Site Run Or Not Error.SiteId={siteId}，SiteName={siteName}，TimeZone={timeZone}，NowTime(UTC+8)={runTime}", "CustClosingBalanceWorker");
+                        _logger.LogInformation($"Check Site Run Or Not Error At {startTime} - {endTime}，NowTime(UTC+8)={runTime}");
+                        
                         continue;
                     }
+
+                    #endregion
 
                     today = Convert.ToDateTime(beginAt).Date.ToString();
 
                     if (DateTime.TryParse($"{beginAt:yyyy/MM/dd} {startTime}", out DateTime startDateTime) &&
                         DateTime.TryParse($"{beginAt:yyyy/MM/dd} {endTime}", out DateTime endDateTime))
                     {
-                        _log2File.Info($"CustClosingBalanceWorker-SiteId={siteId}，SiteName={GetSiteName(siteId)}，StartTime={startDateTime}，EndTime={endDateTime}，BeginAt(UTC+8)={GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss")}", "CustClosingBalanceWorker");
-                        _logger.LogInformation($"{startDateTime} - {endDateTime} {beginAt}");
+                        _log2File.Info($"CustClosingBalanceWorker-Check Site Run Or Not :Get StartDateTime And EndDateTime Success. SiteId={siteId}，SiteName={GetSiteName(siteId)}，StartDateTime={startDateTime}，EndDateTime={endDateTime}，NowTime(UTC+8)={runTime}", "CustClosingBalanceWorker");
+                        _logger.LogInformation($"Check Site Run Or Not :Get StartDateTime And EndDateTime Success. StartDateTime={startDateTime}，EndDateTime={endDateTime}，NowTime(UTC+8)={runTime}");
 
                         if (endDateTime < startDateTime)
                         {
@@ -149,7 +158,15 @@ namespace StatisticalWorker.Workers
                                 {
                                     if(GetUTC8Time() >= startDateTime && GetUTC8Time() <= endDateTime)
                                     {
+                                        _log2File.Info($"CustClosingBalanceWorker-Check Site Run Or Not End :Not Run Yet. SiteId={siteId}，SiteName={GetSiteName(siteId)}，StartDateTime={startDateTime}，EndDateTime={endDateTime}，NowTime(UTC+8)={runTime}", "CustClosingBalanceWorker");
+                                        _logger.LogInformation($"Check Site Run Or Not End :Not Run Yet At {startDateTime} - {endDateTime}，NowTime(UTC+8)={runTime}");
+
                                         flag = true;
+                                    }
+                                    else
+                                    {
+                                        _log2File.Info($"CustClosingBalanceWorker-Check Site Run Or Not End :Already Run. SiteId={siteId}，SiteName={GetSiteName(siteId)}，StartDateTime={startDateTime}，EndDateTime={endDateTime}，NowTime(UTC+8)={runTime}", "CustClosingBalanceWorker");
+                                        _logger.LogInformation($"Check Site Run Or Not End :Already Run At {startDateTime} - {endDateTime}，NowTime(UTC+8)={runTime}");
                                     }
                                 }
                                 break;
@@ -158,7 +175,15 @@ namespace StatisticalWorker.Workers
                                 {
                                     if (GetUTC8Time() >= startDateTime && GetUTC8Time() <= endDateTime)
                                     {
+                                        _log2File.Info($"CustClosingBalanceWorker-Check Site Run Or Not End :Not Run Yet. SiteId={siteId}，SiteName={GetSiteName(siteId)}，StartDateTime={startDateTime}，EndDateTime={endDateTime}，NowTime(UTC+8)={runTime}", "CustClosingBalanceWorker");
+                                        _logger.LogInformation($"Check Site Run Or Not End :Not Run Yet At {startDateTime} - {endDateTime}，NowTime(UTC+8)={runTime}");
+
                                         flag = true;
+                                    }
+                                    else
+                                    {
+                                        _log2File.Info($"CustClosingBalanceWorker-Check Site Run Or Not End :Already Run. SiteId={siteId}，SiteName={GetSiteName(siteId)}，StartDateTime={startDateTime}，EndDateTime={endDateTime}，NowTime(UTC+8)={runTime}", "CustClosingBalanceWorker");
+                                        _logger.LogInformation($"Check Site Run Or Not End : Already Run At {startDateTime} - {endDateTime}，NowTime(UTC+8)={runTime}");
                                     }
                                 }
                                 break;
@@ -167,7 +192,15 @@ namespace StatisticalWorker.Workers
                                 {
                                     if (GetUTC8Time() >= startDateTime && GetUTC8Time() <= endDateTime)
                                     {
+                                        _log2File.Info($"CustClosingBalanceWorker-Check Site Run Or Not End :Not Run Yet. SiteId={siteId}，SiteName={GetSiteName(siteId)}，StartDateTime={startDateTime}，EndDateTime={endDateTime}，NowTime(UTC+8)={runTime}", "CustClosingBalanceWorker");
+                                        _logger.LogInformation($"Check Site Run Or Not End: Not Run Yet At {startDateTime} - {endDateTime}，NowTime(UTC+8)={runTime}");
+
                                         flag = true;
+                                    }
+                                    else
+                                    {
+                                        _log2File.Info($"CustClosingBalanceWorker-Check Site Run Or Not End :Already Run. SiteId={siteId}，SiteName={GetSiteName(siteId)}，StartDateTime={startDateTime}，EndDateTime={endDateTime}，NowTime(UTC+8)={runTime}", "CustClosingBalanceWorker");
+                                        _logger.LogInformation($"Check Site Run Or Not End :Already Run At {startDateTime} - {endDateTime}，NowTime(UTC+8)={runTime}");
                                     }
                                 }
                                 break;
@@ -177,12 +210,10 @@ namespace StatisticalWorker.Workers
 
                 #endregion
 
-                _log2File.Info($"CustClosingBalanceWorker-{GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss")}，SiteId={siteId}，TimeZone={timeZone}  Run Start.", "CustClosingBalanceWorker");
-                _logger.LogInformation($"CustClosingBalanceWorker-{GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss")}，SiteId={siteId}，TimeZone={timeZone}  Run Start.");
-
                 if (flag)
                 {
-
+                    _log2File.Info($"CustClosingBalanceWorker-Run Start At Time(UTC+8)={runTime} With SiteId={siteId}, SiteName={GetSiteName(siteId)}, TimeZone={timeZone}.", "CustClosingBalanceWorker");
+                    _logger.LogInformation($"CustClosingBalanceWorker-Run Start At Time(UTC+8)={runTime} With SiteId={siteId}, SiteName={GetSiteName(siteId)}, TimeZone={timeZone}.");
 
                     int totalCount = _custClosingBalanceBLL.SetCustClosingBalance(
                                      new CustClosingBalanceParameterModel()
@@ -190,9 +221,6 @@ namespace StatisticalWorker.Workers
                                          SiteId = (int)siteId,
                                          TimeZone = timeZone>=0 ? $"+{timeZone.ToString()}:00" : $"{timeZone.ToString()}:00"
                                      });
-
-                    _log2File.Info(string.Format("CustClosingBalanceWorker-{0} Run Success.SiteId={1}，SiteName={2}，TimeZone={3}，Affected Count:{4}", GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss"),siteId,GetSiteName(siteId),timeZone, totalCount), "CustClosingBalanceWorker");
-                    _logger.LogInformation(string.Format("CustClosingBalanceWorker-{0}  Run Success.SiteId={1}，SiteName={2}，TimeZone={3}，Affected Count:{4}", GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss"), siteId, GetSiteName(siteId), timeZone, totalCount));
 
                     switch (siteId)
                     {
@@ -213,15 +241,21 @@ namespace StatisticalWorker.Workers
                             break;
                     }
 
-                    Thread.Sleep(coldDownTime * 1000);
+                    _log2File.Info($"CustClosingBalanceWorker-Run Success At Time(UTC+8)={runTime} With SiteId={siteId}, SiteName={GetSiteName(siteId)}, TimeZone={timeZone}, Affected Count:{totalCount}.", "CustClosingBalanceWorker");
+                    _logger.LogInformation($"CustClosingBalanceWorker-Run Success At Time(UTC+8)={runTime} With SiteId={siteId}, SiteName={GetSiteName(siteId)}, TimeZone={timeZone}, Affected Count:{totalCount}.");
+
                 }
+
+                Thread.Sleep(coldDownTime * 1000);
+
+                _log2File.Info($"CustClosingBalanceWorker-Run End At Time(UTC+8)={runTime}.", "CustClosingBalanceWorker");
+                _logger.LogInformation($"CustClosingBalanceWorker-Run End At Time(UTC+8)={runTime}.");
 
             }
             catch (Exception ex)
             {
-
-                _logger.LogError(ex.Message);
-
+                _log2File.Error($"CustClosingBalanceWorker-Run Exception At Time(UTC+8)={runTime}.Message={ex.Message}", "CustClosingBalanceWorker");
+                _logger.LogError($"CustClosingBalanceWorker-Run Exception At Time(UTC+8)={runTime}.Message={ex.Message}");
             }
             finally
             {
