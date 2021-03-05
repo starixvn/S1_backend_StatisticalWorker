@@ -125,7 +125,7 @@ namespace StatisticalWorker.Workers
 
                     #region Get BeginAt
 
-                    beginAt = timeZone != null ? GetUTCTimeByTimeZone((int)timeZone) : null;
+                    beginAt = GetUTC8Time();
                     if (beginAt == null)
                     {
                         string siteName = GetSiteName(siteId);
