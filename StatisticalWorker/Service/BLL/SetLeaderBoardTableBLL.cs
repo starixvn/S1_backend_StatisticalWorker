@@ -58,6 +58,10 @@ namespace StatisticalWorker.Service.BLL
         {
             return setLeaderBoardTableService.GetLeaderBoardDataV2(is14, siteId, eventCode, startDate, endDate, timeZone, sPName);
         }
+        public IEnumerable<LeaderBoardModelV2> GetLeaderBoardExtraPoint( int siteId, string eventCode, string startDate, string endDate, string timeZone)
+        {
+            return setLeaderBoardTableService.GetLeaderBoardExtraPoint(siteId, eventCode, startDate, endDate, timeZone);
+        }
         public IEnumerable<LeaderBoardEvent> GetLeaderboardEvent()
         {
             return setLeaderBoardTableService.GetLeaderboardEvent();

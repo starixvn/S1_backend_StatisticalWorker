@@ -112,6 +112,11 @@ namespace StatisticalWorker.Service.DAL
             using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
             return conn.Query<LeaderBoardModelV2>(sPName, new { SiteId = siteId, EventCode = eventCode, StartDate = startDate, EndDate = endDate, TimeZone = timeZone, Is14 = is14 }, commandType: CommandType.StoredProcedure);
         }
+        public IEnumerable<LeaderBoardModelV2> GetLeaderBoardExtraPoint( int siteId, string eventCode, string startDate, string endDate, string timeZone)
+        {
+            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            return conn.Query<LeaderBoardModelV2>("Service_LeaderboardExtraPoint_Get", new { SiteId = siteId, EventCode = eventCode, StartDate = startDate, EndDate = endDate, TimeZone = timeZone }, commandType: CommandType.StoredProcedure);
+        }
         public IEnumerable<LeaderBoardEvent> GetLeaderboardEvent()
         {
             using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
