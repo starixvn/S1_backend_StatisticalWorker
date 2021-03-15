@@ -22,14 +22,16 @@ namespace StatisticalWorker.Workers
         private readonly SetLeaderBoardTableBLL setLeaderBoardTableBLL;
         private readonly ILogger<LeaderBoardWorker> logger;
         private readonly Log2File log2File;
+        private readonly IHostEnvironment environment;
         #endregion
 
         #region - Construction method -
-        public LeaderBoardWorker(ILogger<LeaderBoardWorker> logger, SetLeaderBoardTableBLL setLeaderBoardTableBLL, Log2File log2File)
+        public LeaderBoardWorker(ILogger<LeaderBoardWorker> logger, SetLeaderBoardTableBLL setLeaderBoardTableBLL, IHostEnvironment environment, Log2File log2File)
         {
             this.logger = logger;
             this.setLeaderBoardTableBLL = setLeaderBoardTableBLL;
             this.log2File = log2File;
+            this.environment = environment;
         }
         #endregion
 
@@ -38,8 +40,8 @@ namespace StatisticalWorker.Workers
         {
             //doN88LeaderBoard = new Timer(DoN88LeaderBoard, null, TimeSpan.Zero, TimeSpan.Zero);
             //doBGLeaderBoard = new Timer(DoBGLeaderBoard, null, TimeSpan.Zero, TimeSpan.Zero);
-            setN88LeaderBoardDeposit = new Timer(SetN88LeaderBoardDeposit, null, TimeSpan.Zero, TimeSpan.Zero);
-            setBGLeaderBoardDeposit = new Timer(SetBGLeaderBoardDeposit, null, TimeSpan.Zero, TimeSpan.Zero);
+           // setN88LeaderBoardDeposit = new Timer(SetN88LeaderBoardDeposit, null, TimeSpan.Zero, TimeSpan.Zero);
+           // setBGLeaderBoardDeposit = new Timer(SetBGLeaderBoardDeposit, null, TimeSpan.Zero, TimeSpan.Zero);
             doLeaderBoardV2 = new Timer(DoLeaderBoardV2, null, TimeSpan.Zero, TimeSpan.Zero);
 
             return Task.CompletedTask;
@@ -232,10 +234,23 @@ namespace StatisticalWorker.Workers
                     leaderBoardDataList.Add(leaderBoardDataList14);
                 }
             }
+            //var item = setLeaderBoardTableBLL.GetLeaderBoardExtraPoint(EventData.SiteId, EventData.EventCode, EventData.StartTime, EventData.EndTime, EventData.TimeZoom);
+            foreach (var leaderBoardExtraPoint in setLeaderBoardTableBLL.GetLeaderBoardExtraPoint(EventData.SiteId, EventData.EventCode, EventData.StartTime, EventData.EndTime, EventData.TimeZoom))
+            {
+                if (dd.ContainsKey($"{leaderBoardExtraPoint.CategoryId}_{leaderBoardExtraPoint.CustId}"))
+                {
+                    dd[$"{leaderBoardExtraPoint.CategoryId}_{leaderBoardExtraPoint.CustId}"].Turnover += leaderBoardExtraPoint.Turnover;
+                    dd[$"{leaderBoardExtraPoint.CategoryId}_{leaderBoardExtraPoint.CustId}"].WinlostAmount += leaderBoardExtraPoint.WinlostAmount;
+                }
+                else
+                {
+                    leaderBoardDataList.Add(leaderBoardExtraPoint);
+                }
+            }
 
             setLeaderBoardTableBLL.SetLeaderBoardTableV2(leaderBoardDataList);
 
-        }
+     }
         private void DoLeaderBoardV2(object state)
         {
             DateTime utcNow = DateTime.Now.ToUniversalTime();
@@ -249,11 +264,15 @@ namespace StatisticalWorker.Workers
                 var EventList = setLeaderBoardTableBLL.GetLeaderboardEvent();
                 foreach (var data in EventList)
                 {
-                    logger.LogInformation($"SiteId:{data.SiteId}-{data.EventCode} - {dtime.ToString("yyyy/MM/dd HH:mm:ss")}");
-                   // log2File.Info($"SiteId:{data.SiteId}-{data.EventCode} - {dtime.ToString("yyyy/MM/dd HH:mm:ss")}","LeaderBoardV2WorkerLog");
-                    LeaderBoardstatistics(data);
-                }
+                    logger.LogInformation($"SiteId:{data.SiteId}-EventCode:{data.EventCode} - {dtime.ToString("yyyy/MM/dd HH:mm:ss")}");
 
+                    // log2File.Info($"SiteId:{data.SiteId}-{data.EventCode} - {dtime.ToString("yyyy/MM/dd HH:mm:ss")}","LeaderBoardV2WorkerLog");
+                    LeaderBoardstatistics(data);
+                    if (environment.IsDevelopment())
+                    {
+                        logger.LogInformation($"END SiteId:{data.SiteId}-EventCode:{data.EventCode} - {GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss")}");
+                    }
+                }
                 setLeaderBoardTableBLL.CheckLeaderboardOverTime();
             }
             catch (Exception ex)
@@ -272,6 +291,10 @@ namespace StatisticalWorker.Workers
                     nextTime -= 30;
                 TimeSpan dueTimeSpan = TimeSpan.FromMinutes(nextTime);
                 doLeaderBoardV2.Change(dueTimeSpan, TimeSpan.Zero);
+                if (environment.IsDevelopment())
+                {
+                    logger.LogInformation(string.Format("finish LeaderBoardV2Worker-{0}", GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss")));
+                }
             }
         }
         public override Task StopAsync(CancellationToken cancellationToken)
