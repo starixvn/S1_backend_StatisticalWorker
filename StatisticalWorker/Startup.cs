@@ -23,14 +23,20 @@ namespace StatisticalWorker
             //DAL
             services.AddSingleton<SetLeaderBoardTableService>();
             services.AddSingleton<OnlineCountService>();
+            services.AddSingleton<TpBetRecordRelayService>();
+            services.AddSingleton<CustClosingBalanceService>();
 
             //BLL
             services.AddSingleton<SetLeaderBoardTableBLL>();
             services.AddSingleton<OnlineCountBLL>();
+            services.AddSingleton<TpBetRecordRelayBLL>();
+            services.AddSingleton<CustClosingBalanceBLL>();
 
             //Worker
             services.AddHostedService<LeaderBoardWorker>();
             services.AddHostedService<OnlineCountWorker>();
+            services.AddHostedService<TpBetRecordRelayForReportWorker>();
+            services.AddHostedService<CustClosingBalanceWorker>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

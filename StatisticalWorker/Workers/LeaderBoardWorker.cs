@@ -40,8 +40,8 @@ namespace StatisticalWorker.Workers
         {
             //doN88LeaderBoard = new Timer(DoN88LeaderBoard, null, TimeSpan.Zero, TimeSpan.Zero);
             //doBGLeaderBoard = new Timer(DoBGLeaderBoard, null, TimeSpan.Zero, TimeSpan.Zero);
-            //setN88LeaderBoardDeposit = new Timer(SetN88LeaderBoardDeposit, null, TimeSpan.Zero, TimeSpan.Zero);
-            //setBGLeaderBoardDeposit = new Timer(SetBGLeaderBoardDeposit, null, TimeSpan.Zero, TimeSpan.Zero);
+            setN88LeaderBoardDeposit = new Timer(SetN88LeaderBoardDeposit, null, TimeSpan.Zero, TimeSpan.Zero);
+            setBGLeaderBoardDeposit = new Timer(SetBGLeaderBoardDeposit, null, TimeSpan.Zero, TimeSpan.Zero);
             doLeaderBoardV2 = new Timer(DoLeaderBoardV2, null, TimeSpan.Zero, TimeSpan.Zero);
 
             return Task.CompletedTask;
