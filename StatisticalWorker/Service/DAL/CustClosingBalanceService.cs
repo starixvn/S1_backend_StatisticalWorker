@@ -34,18 +34,13 @@ namespace StatisticalWorker.Service.DAL
         /// </summary>
         /// <param name="param"></param>
         /// <returns>Affected row counts</returns>
-        public int SetCustClosingBalanceData(CustClosingBalanceParameterModel param)
+        public int SetCustClosingBalanceData()
         {
             int totalCount = 0;
 
             using (MySqlConnection conn = new MySqlConnection(_configuration.GetConnectionString("ConnectionString")))
             {
-                var parameters = new DynamicParameters(
-                new
-                {
-                    _SiteId = param.SiteId,
-                    _TimeZone = param.TimeZone
-                });
+                var parameters = new DynamicParameters();
                 parameters.Add("TotalCount", totalCount, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
 
                 string SpName = "Service_CustClosingBalance_Set";

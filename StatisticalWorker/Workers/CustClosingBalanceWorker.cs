@@ -24,9 +24,8 @@ namespace StatisticalWorker.Workers
         private readonly CustClosingBalanceBLL _custClosingBalanceBLL;
         private readonly IConfiguration _configuration;
 
-        private string processNovaDate = string.Empty;
-        private string processGoalDate = string.Empty;
-        private string processBwingDate = string.Empty;
+        private string processUTCSevenDate = string.Empty;
+        private string processUTCEightDate = string.Empty;
         #endregion
 
         #region Construction method
@@ -71,7 +70,6 @@ namespace StatisticalWorker.Workers
             string today = string.Empty;
             string runTime = GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss");
 
-            int? siteId = null;
             int? timeZone = null;
             int coldDownTime = 10;
             int checkTime = 10;
@@ -87,38 +85,26 @@ namespace StatisticalWorker.Workers
 
                 #region CheckParameter
 
-                for (int i = 1; i <= 3 && flag==false ; i++)
+                for (int i = 7; i <= 8 && flag==false ; i++)
                 {
                     switch (i)
                     {
-                        case 1:
-                            //Nova88
-                            if (i == _configuration.GetValue<int>("CustClosingBalanceNovaParam:SiteId"))
+                        case 7:
+                            //UTC+7
+                            if (i == _configuration.GetValue<int>("CustClosingBalanceUTCSevenParam:TimeZone"))
                             {
-                                siteId = _configuration.GetValue<int>("CustClosingBalanceNovaParam:SiteId");
-                                timeZone = _configuration.GetValue<int>("CustClosingBalanceNovaParam:TimeZone");
-                                startTime = _configuration.GetValue<string>("CustClosingBalanceNovaParam:StartTime");
-                                endTime = _configuration.GetValue<string>("CustClosingBalanceNovaParam:EndTime");
+                                timeZone = _configuration.GetValue<int>("CustClosingBalanceUTCSevenParam:TimeZone");
+                                startTime = _configuration.GetValue<string>("CustClosingBalanceUTCSevenParam:StartTime");
+                                endTime = _configuration.GetValue<string>("CustClosingBalanceUTCSevenParam:EndTime");
                             }
                             break;
-                        case 2:
-                            //Goal123
-                            if (i == _configuration.GetValue<int>("CustClosingBalanceGoalParam:SiteId"))
+                        case 8:
+                            //UTC+8
+                            if (i == _configuration.GetValue<int>("CustClosingBalanceUTCEightParam:TimeZone"))
                             {
-                                siteId = _configuration.GetValue<int>("CustClosingBalanceGoalParam:SiteId");
-                                timeZone = _configuration.GetValue<int>("CustClosingBalanceGoalParam:TimeZone");
-                                startTime = _configuration.GetValue<string>("CustClosingBalanceGoalParam:StartTime");
-                                endTime = _configuration.GetValue<string>("CustClosingBalanceGoalParam:EndTime");
-                            }
-                            break;
-                        case 3:
-                            //Bwing
-                            if (i == _configuration.GetValue<int>("CustClosingBalanceBwingParam:SiteId"))
-                            {
-                                siteId = _configuration.GetValue<int>("CustClosingBalanceBwingParam:SiteId");
-                                timeZone = _configuration.GetValue<int>("CustClosingBalanceBwingParam:TimeZone");
-                                startTime = _configuration.GetValue<string>("CustClosingBalanceBwingParam:StartTime");
-                                endTime = _configuration.GetValue<string>("CustClosingBalanceBwingParam:EndTime");
+                                timeZone = _configuration.GetValue<int>("CustClosingBalanceUTCEightParam:TimeZone");
+                                startTime = _configuration.GetValue<string>("CustClosingBalanceUTCEightParam:StartTime");
+                                endTime = _configuration.GetValue<string>("CustClosingBalanceUTCEightParam:EndTime");
                             }
                             break;
                     }
@@ -128,10 +114,8 @@ namespace StatisticalWorker.Workers
                     beginAt = GetUTC8Time();
                     if (beginAt == null)
                     {
-                        string siteName = GetSiteName(siteId);
-
-                        _log2File.Error($"CustClosingBalanceWorker-Check Site Run Or Not Error.SiteId={siteId}，SiteName={siteName}，TimeZone={timeZone}，NowTime(UTC+8)={runTime}", "CustClosingBalanceWorker");
-                        _logger.LogInformation($"Check Site Run Or Not Error At {startTime} - {endTime}，NowTime(UTC+8)={runTime}");
+                        _log2File.Error($"CustClosingBalanceWorker-Check Run Or Not Error. TimeZone={timeZone} NowTime(UTC+8)={runTime}", "CustClosingBalanceWorker");
+                        _logger.LogInformation($"Check Run Or Not Error At {startTime} - {endTime}，TimeZone={timeZone} NowTime(UTC+8)={runTime}");
                         
                         continue;
                     }
@@ -143,8 +127,8 @@ namespace StatisticalWorker.Workers
                     if (DateTime.TryParse($"{beginAt:yyyy/MM/dd} {startTime}", out DateTime startDateTime) &&
                         DateTime.TryParse($"{beginAt:yyyy/MM/dd} {endTime}", out DateTime endDateTime))
                     {
-                        _log2File.Info($"CustClosingBalanceWorker-Check Site Run Or Not :Get StartDateTime And EndDateTime Success. SiteId={siteId}，SiteName={GetSiteName(siteId)}，StartDateTime={startDateTime}，EndDateTime={endDateTime}，NowTime(UTC+8)={runTime}", "CustClosingBalanceWorker");
-                        _logger.LogInformation($"Check Site Run Or Not :Get StartDateTime And EndDateTime Success. StartDateTime={startDateTime}，EndDateTime={endDateTime}，NowTime(UTC+8)={runTime}");
+                        _log2File.Info($"CustClosingBalanceWorker-Check Run Or Not :Get StartDateTime And EndDateTime Success. StartDateTime={startDateTime}，EndDateTime={endDateTime}，TimeZone={timeZone}，NowTime(UTC+8)={runTime}", "CustClosingBalanceWorker");
+                        _logger.LogInformation($"Check Run Or Not :Get StartDateTime And EndDateTime Success. StartDateTime={startDateTime}，EndDateTime={endDateTime}，TimeZone={timeZone}，NowTime(UTC+8)={runTime}");
 
                         if (endDateTime < startDateTime)
                         {
@@ -153,54 +137,37 @@ namespace StatisticalWorker.Workers
 
                         switch (i)
                         {
-                            case 1:
-                                if (today != processNovaDate) //Don't do it again.
+                            case 7:
+                                if (today != processUTCSevenDate) //Don't do it again.
                                 {
                                     if(GetUTC8Time() >= startDateTime && GetUTC8Time() <= endDateTime)
                                     {
-                                        _log2File.Info($"CustClosingBalanceWorker-Check Site Run Or Not End :Not Run Yet. SiteId={siteId}，SiteName={GetSiteName(siteId)}，StartDateTime={startDateTime}，EndDateTime={endDateTime}，NowTime(UTC+8)={runTime}", "CustClosingBalanceWorker");
-                                        _logger.LogInformation($"Check Site Run Or Not End :Not Run Yet At {startDateTime} - {endDateTime}，NowTime(UTC+8)={runTime}");
+                                        _log2File.Info($"CustClosingBalanceWorker-Check Run Or Not End :Not Run Yet. StartDateTime={startDateTime}，EndDateTime={endDateTime}，TimeZone={timeZone}，NowTime(UTC+8)={runTime}", "CustClosingBalanceWorker");
+                                        _logger.LogInformation($"Check Site Run Or Not End :Not Run Yet At {startDateTime} - {endDateTime}，TimeZone={timeZone}，NowTime(UTC+8)={runTime}");
 
                                         flag = true;
                                     }
                                     else
                                     {
-                                        _log2File.Info($"CustClosingBalanceWorker-Check Site Run Or Not End :Already Run. SiteId={siteId}，SiteName={GetSiteName(siteId)}，StartDateTime={startDateTime}，EndDateTime={endDateTime}，NowTime(UTC+8)={runTime}", "CustClosingBalanceWorker");
-                                        _logger.LogInformation($"Check Site Run Or Not End :Already Run At {startDateTime} - {endDateTime}，NowTime(UTC+8)={runTime}");
+                                        _log2File.Info($"CustClosingBalanceWorker-Check Run Or Not End :Already Run. StartDateTime={startDateTime}，EndDateTime={endDateTime}，TimeZone={timeZone}，NowTime(UTC+8)={runTime}", "CustClosingBalanceWorker");
+                                        _logger.LogInformation($"Check Run Or Not End :Already Run At {startDateTime} - {endDateTime}，TimeZone={timeZone}，NowTime(UTC+8)={runTime}");
                                     }
                                 }
                                 break;
-                            case 2:
-                                if (today != processGoalDate) //Don't do it again.
+                            case 8:
+                                if (today != processUTCEightDate) //Don't do it again.
                                 {
                                     if (GetUTC8Time() >= startDateTime && GetUTC8Time() <= endDateTime)
                                     {
-                                        _log2File.Info($"CustClosingBalanceWorker-Check Site Run Or Not End :Not Run Yet. SiteId={siteId}，SiteName={GetSiteName(siteId)}，StartDateTime={startDateTime}，EndDateTime={endDateTime}，NowTime(UTC+8)={runTime}", "CustClosingBalanceWorker");
-                                        _logger.LogInformation($"Check Site Run Or Not End :Not Run Yet At {startDateTime} - {endDateTime}，NowTime(UTC+8)={runTime}");
+                                        _log2File.Info($"CustClosingBalanceWorker-Check Site Run Or Not End :Not Run Yet. StartDateTime={startDateTime}，EndDateTime={endDateTime}，TimeZone={timeZone}，NowTime(UTC+8)={runTime}", "CustClosingBalanceWorker");
+                                        _logger.LogInformation($"Check Site Run Or Not End :Not Run Yet At {startDateTime} - {endDateTime}，TimeZone={timeZone}，NowTime(UTC+8)={runTime}");
 
                                         flag = true;
                                     }
                                     else
                                     {
-                                        _log2File.Info($"CustClosingBalanceWorker-Check Site Run Or Not End :Already Run. SiteId={siteId}，SiteName={GetSiteName(siteId)}，StartDateTime={startDateTime}，EndDateTime={endDateTime}，NowTime(UTC+8)={runTime}", "CustClosingBalanceWorker");
-                                        _logger.LogInformation($"Check Site Run Or Not End : Already Run At {startDateTime} - {endDateTime}，NowTime(UTC+8)={runTime}");
-                                    }
-                                }
-                                break;
-                            case 3:
-                                if (today != processBwingDate) //Don't do it again.
-                                {
-                                    if (GetUTC8Time() >= startDateTime && GetUTC8Time() <= endDateTime)
-                                    {
-                                        _log2File.Info($"CustClosingBalanceWorker-Check Site Run Or Not End :Not Run Yet. SiteId={siteId}，SiteName={GetSiteName(siteId)}，StartDateTime={startDateTime}，EndDateTime={endDateTime}，NowTime(UTC+8)={runTime}", "CustClosingBalanceWorker");
-                                        _logger.LogInformation($"Check Site Run Or Not End: Not Run Yet At {startDateTime} - {endDateTime}，NowTime(UTC+8)={runTime}");
-
-                                        flag = true;
-                                    }
-                                    else
-                                    {
-                                        _log2File.Info($"CustClosingBalanceWorker-Check Site Run Or Not End :Already Run. SiteId={siteId}，SiteName={GetSiteName(siteId)}，StartDateTime={startDateTime}，EndDateTime={endDateTime}，NowTime(UTC+8)={runTime}", "CustClosingBalanceWorker");
-                                        _logger.LogInformation($"Check Site Run Or Not End :Already Run At {startDateTime} - {endDateTime}，NowTime(UTC+8)={runTime}");
+                                        _log2File.Info($"CustClosingBalanceWorker-Check Site Run Or Not End :Already Run. StartDateTime={startDateTime}，EndDateTime={endDateTime}，TimeZone={timeZone}，NowTime(UTC+8)={runTime}", "CustClosingBalanceWorker");
+                                        _logger.LogInformation($"Check Site Run Or Not End : Already Run At {startDateTime} - {endDateTime}，TimeZone={timeZone}，NowTime(UTC+8)={runTime}");
                                     }
                                 }
                                 break;
@@ -212,44 +179,34 @@ namespace StatisticalWorker.Workers
 
                 if (flag)
                 {
-                    _log2File.Info($"CustClosingBalanceWorker-Run Start At Time(UTC+8)={runTime} With SiteId={siteId}, SiteName={GetSiteName(siteId)}, TimeZone={timeZone}.", "CustClosingBalanceWorker");
-                    _logger.LogInformation($"CustClosingBalanceWorker-Run Start At Time(UTC+8)={runTime} With SiteId={siteId}, SiteName={GetSiteName(siteId)}, TimeZone={timeZone}.");
+                    _log2File.Info($"CustClosingBalanceWorker-Run Start At Time(UTC+8)={runTime}，TimeZone={timeZone}.", "CustClosingBalanceWorker");
+                    _logger.LogInformation($"CustClosingBalanceWorker-Run Start At Time(UTC+8)={runTime}，TimeZone={timeZone}.");
 
-                    int totalCount = _custClosingBalanceBLL.SetCustClosingBalance(
-                                     new CustClosingBalanceParameterModel()
-                                     {
-                                         SiteId = (int)siteId,
-                                         TimeZone = timeZone>=0 ? $"+{timeZone.ToString()}:00" : $"{timeZone.ToString()}:00"
-                                     });
+                    int totalCount = _custClosingBalanceBLL.SetCustClosingBalance();
 
-                    switch (siteId)
+                    switch (timeZone)
                     {
-                        case 1:
-                            processNovaDate = today;
-                            coldDownTime = _configuration.GetValue<int>("CustClosingBalanceNovaParam:ColdDownTime");
-                            checkTime= _configuration.GetValue<int>("CustClosingBalanceNovaParam:CheckTime");
+                        case 7:
+                            processUTCSevenDate = today;
+                            coldDownTime = _configuration.GetValue<int>("CustClosingBalanceUTCSevenParam:ColdDownTime");
+                            checkTime= _configuration.GetValue<int>("CustClosingBalanceUTCSevenParam:CheckTime");
                             break;
-                        case 2:
-                            processGoalDate = today;
-                            coldDownTime = _configuration.GetValue<int>("CustClosingBalanceGoalParam:ColdDownTime");
-                            checkTime = _configuration.GetValue<int>("CustClosingBalanceGoalParam:CheckTime");
-                            break;
-                        case 3:
-                            processBwingDate = today;
-                            coldDownTime = _configuration.GetValue<int>("CustClosingBalanceBwingParam:ColdDownTime");
-                            checkTime = _configuration.GetValue<int>("CustClosingBalanceBwingParam:CheckTime");
+                        case 8:
+                            processUTCEightDate = today;
+                            coldDownTime = _configuration.GetValue<int>("CustClosingBalanceUTCEightParam:ColdDownTime");
+                            checkTime = _configuration.GetValue<int>("CustClosingBalanceUTCEightParam:CheckTime");
                             break;
                     }
 
-                    _log2File.Info($"CustClosingBalanceWorker-Run Success At Time(UTC+8)={runTime} With SiteId={siteId}, SiteName={GetSiteName(siteId)}, TimeZone={timeZone}, Affected Count:{totalCount}.", "CustClosingBalanceWorker");
-                    _logger.LogInformation($"CustClosingBalanceWorker-Run Success At Time(UTC+8)={runTime} With SiteId={siteId}, SiteName={GetSiteName(siteId)}, TimeZone={timeZone}, Affected Count:{totalCount}.");
+                    _log2File.Info($"CustClosingBalanceWorker-Run Success At Time(UTC+8)={runTime}, TimeZone={timeZone}, Affected Count:{totalCount}.", "CustClosingBalanceWorker");
+                    _logger.LogInformation($"CustClosingBalanceWorker-Run Success At Time(UTC+8)={runTime}, TimeZone={timeZone}, Affected Count:{totalCount}.");
 
                 }
 
                 Thread.Sleep(coldDownTime * 1000);
 
-                _log2File.Info($"CustClosingBalanceWorker-Run End At Time(UTC+8)={runTime}.", "CustClosingBalanceWorker");
-                _logger.LogInformation($"CustClosingBalanceWorker-Run End At Time(UTC+8)={runTime}.");
+                _log2File.Info($"CustClosingBalanceWorker-Run End At Time(UTC+8)={runTime}.TimeZone={timeZone}", "CustClosingBalanceWorker");
+                _logger.LogInformation($"CustClosingBalanceWorker-Run End At Time(UTC+8)={runTime}.TimeZone={timeZone}");
 
             }
             catch (Exception ex)
@@ -272,99 +229,6 @@ namespace StatisticalWorker.Workers
         private DateTime GetUTC8Time()
         {
             return new DateTimeOffset(DateTime.Now).ToOffset(new TimeSpan(8, 0, 0)).DateTime;
-        }
-
-        /// <summary>
-        /// Get UTC Time With TimeZone
-        /// 取得時區時間
-        /// </summary>
-        /// <param name="timeZone">時區</param>
-        /// <returns></returns>
-        private DateTime GetUTCTimeByTimeZone(int timeZone)
-        {
-            return new DateTimeOffset(DateTime.Now).ToOffset(new TimeSpan(timeZone, 0, 0)).DateTime;
-        }
-
-        /// <summary>
-        /// Get SiteName
-        /// 取得伺服器名稱
-        /// </summary>
-        /// <param name="siteId">伺服器ID</param>
-        /// <returns></returns>
-        private string GetSiteName(int? siteId)
-        {
-            switch (siteId)
-            {
-                case 1:
-                    return "Nova88";
-                case 2:
-                    return "Goal123";
-                case 3:
-                    return "Bwing";
-                default:
-                    return string.Empty;
-            }
-        }
-
-        /// <summary>
-        /// Parameter Check Step
-        /// </summary>
-        /// <param name="tablecheck">Table Name</param>
-        /// <param name="sDate"></param>
-        /// <param name="eDate"></param>
-        /// <param name="table"></param>
-        /// <param name="startDate"></param>
-        /// <param name="endDate"></param>
-        /// <returns></returns>
-        private bool CheckParameter(bool tablecheck,
-                                    string sDate,
-                                    string eDate,
-                                    out bool table,
-                                    out string startDate,
-                                    out string endDate)
-        {
-            startDate = string.Empty;
-            endDate = string.Empty;
-            table = tablecheck;
-
-            if (tablecheck)
-            {
-                //TpBetRecord14
-
-                if (String.IsNullOrEmpty(sDate) || String.IsNullOrEmpty(eDate))
-                {
-                    return false;
-                }
-                else
-                {
-                    startDate = sDate;
-                    endDate = eDate;
-                }
-            }
-            else
-            {
-                //TpBetRecord
-
-                if (String.IsNullOrEmpty(sDate))
-                {
-                    startDate = DateTime.Today.AddDays(-1).ToString("yyyy-MM-dd");
-                }
-                else
-                {
-                    startDate = sDate;
-                }
-
-                if (String.IsNullOrEmpty(eDate))
-                {
-                    endDate = DateTime.Today.AddDays(-14).ToString("yyyy-MM-dd");
-                }
-                else
-                {
-                    endDate = eDate;
-                }
-            }
-
-            return true;
         }
 
         #endregion
