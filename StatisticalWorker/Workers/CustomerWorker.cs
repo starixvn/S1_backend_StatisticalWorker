@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using StatisticalWorker.Service.BLL;
+using StatisticalWorker.Service.Extensions;
 
 namespace StatisticalWorker.Workers
 {
@@ -16,8 +17,6 @@ namespace StatisticalWorker.Workers
         private readonly ILogger<CustomerWorker> _logger;
         private readonly CustomerBLL _customerBll;
         private readonly IConfiguration _configuration;
-        private string processUTCSevenDate = string.Empty;
-        private string processUTCEightDate = string.Empty;
 
         public CustomerWorker(IServiceProvider serviceProvider)
         {
@@ -44,20 +43,11 @@ namespace StatisticalWorker.Workers
             try
             {
                 success = _customerBll.ProcessCustomerStatus();
-                // var vipSettings = _vipBll.GetVipSettings().ToList();
-                // var currentTime = DateTime.UtcNow.AddHours(8);
-                // _vipBll.UpgradeReview(vipSettings, currentTime, out var upgradeReviewSuccess);
-                // _vipBll.UpgradeCustomer(vipSettings, currentTime, out var upgradeCustomerSuccess);
-                //
-                // if (!upgradeReviewSuccess || !upgradeCustomerSuccess)
-                // {
-                //     success = false;
-                // }
             }
             catch (Exception ex)
             {
                 success = false;
-                // _logger.LogError(ex, MethodExtension.GetCurrentMethod());
+                _logger.LogError(ex, MethodExtension.GetCurrentMethod());
             }
             finally
             {
