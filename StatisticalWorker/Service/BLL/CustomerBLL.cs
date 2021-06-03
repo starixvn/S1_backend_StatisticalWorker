@@ -39,10 +39,17 @@ namespace StatisticalWorker.Service.BLL
                     
                     foreach (var day in dormantSetting.Days)
                     {
+                        var statusList = new List<int> {(int) CustStatus.Running};
+                        if (day == 90)
+                        {
+                            statusList.Add((int) CustStatus.Lock);
+                        }
+                        
                         var unDepositCustomers = GetDormantAccount(new DormantAccountInput
                         {
                             SiteId = dormantSetting.SiteId,
-                            Day = day
+                            Day = day,
+                            StatusList = $"[{string.Join(",", statusList)}]"
                         });
 
                         foreach (var unDepositCustomer in unDepositCustomers)

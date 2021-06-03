@@ -28,7 +28,7 @@ namespace StatisticalWorker.Service.DAL
         
         public IEnumerable<DormantAccountOutput> GetDormantAccount(DormantAccountInput dormantAccountInput)
         {
-            var parameters = new DynamicParameters(new {dormantAccountInput.SiteId, dormantAccountInput.Day});
+            var parameters = new DynamicParameters(new {dormantAccountInput.SiteId, dormantAccountInput.Day, dormantAccountInput.StatusList});
             return _reportDbClient.Query<DormantAccountOutput>("Service_DormantAccount_Get", parameters, 180);
         }
         

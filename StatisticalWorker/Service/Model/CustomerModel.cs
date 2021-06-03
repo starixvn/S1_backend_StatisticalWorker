@@ -26,8 +26,9 @@ namespace StatisticalWorker.Service.Model
     {
         public int SiteId { get; set; }
         public int Day { get; set; }
+        public string StatusList { get; set; }
     }
-    
+
     public class DormantAccountOutput
     {
         public int CustId { get; set; }
