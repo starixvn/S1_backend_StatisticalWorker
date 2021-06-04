@@ -28,8 +28,12 @@ namespace StatisticalWorker.Service.BLL
         {
             try
             {
-                var dormantSettings = GetDormantSetting();
                 var currentTime = DateTime.UtcNow;
+                if (currentTime < Convert.ToDateTime("07/04/2021"))
+                {
+                    return true;
+                }
+                var dormantSettings = GetDormantSetting();
                 foreach (var dormantSetting in dormantSettings)
                 {
                     if ((currentTime - dormantSetting.LastUpdateTime).TotalDays < 1)
