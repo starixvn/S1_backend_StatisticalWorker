@@ -61,7 +61,7 @@ namespace StatisticalWorker.Service.BLL
                             if ((currentTime - unDepositCustomer.LastLockTime).TotalDays > 30)
                             {
                                 var result = LockDormantAccountSet(unDepositCustomer.CustId, day);
-                                if (result > 0)
+                                if (result >= 0)
                                 {
                                     CustNotesSet(new CustNotesInput
                                     {
