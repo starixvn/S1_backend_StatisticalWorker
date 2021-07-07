@@ -212,7 +212,7 @@ namespace StatisticalWorker.Workers
             catch (Exception ex)
             {
                 _log2File.Error($"CustClosingBalanceWorker-Run Exception At Time(UTC+8)={runTime}.Message={ex.Message}", "CustClosingBalanceWorker");
-                _logger.LogError($"CustClosingBalanceWorker-Run Exception At Time(UTC+8)={runTime}.Message={ex.Message}");
+                _logger.LogError(ex, $"CustClosingBalanceWorker-Run Exception At Time(UTC+8)={runTime}.Message={ex.Message}");
             }
             finally
             {

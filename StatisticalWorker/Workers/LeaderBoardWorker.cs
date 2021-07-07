@@ -81,7 +81,7 @@ namespace StatisticalWorker.Workers
             catch (Exception ex)
             {
                 log2File.Error(ex.ToString(), "N88LeaderBoardWorkerLog");
-                logger.LogError(ex.Message);
+                logger.LogError(ex, ex.Message);
             }
             finally
             {
@@ -130,7 +130,7 @@ namespace StatisticalWorker.Workers
             catch (Exception ex)
             {
                 log2File.Info(ex.Message, "BGLeaderBoardWorkerLog");
-                logger.LogError(ex.Message);
+                logger.LogError(ex, ex.Message);
             }
             finally
             {
@@ -162,7 +162,7 @@ namespace StatisticalWorker.Workers
             catch (Exception ex)
             {
                 log2File.Info(ex.Message, "SetN88LeaderBoardDepositLog");
-                logger.LogError(ex.Message);
+                logger.LogError(ex, ex.Message);
             }
             finally
             {
@@ -194,7 +194,7 @@ namespace StatisticalWorker.Workers
             catch (Exception ex)
             {
                 log2File.Info(ex.Message, "SetBGLeaderBoardDepositLog");
-                logger.LogError(ex.Message);
+                logger.LogError(ex, ex.Message);
             }
             finally
             {
@@ -278,7 +278,7 @@ namespace StatisticalWorker.Workers
             catch (Exception ex)
             {
                 log2File.Error(ex.ToString(), "LeaderBoardV2WorkerLog");
-                logger.LogError(ex.Message);
+                logger.LogError(ex, ex.Message);
             }
             finally
             {
