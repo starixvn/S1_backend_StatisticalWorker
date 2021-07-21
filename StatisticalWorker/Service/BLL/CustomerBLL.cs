@@ -29,10 +29,6 @@ namespace StatisticalWorker.Service.BLL
             try
             {
                 var currentTime = DateTime.UtcNow;
-                if (currentTime < Convert.ToDateTime("07/04/2021"))
-                {
-                    return true;
-                }
                 var dormantSettings = GetDormantSetting();
                 foreach (var dormantSetting in dormantSettings)
                 {
@@ -44,7 +40,7 @@ namespace StatisticalWorker.Service.BLL
                     foreach (var day in dormantSetting.Days)
                     {
                         var statusList = new List<int> {(int) CustStatus.Running};
-                        if (day == 90)
+                        if (day == 180)
                         {
                             statusList.Add((int) CustStatus.Lock);
                         }
@@ -58,7 +54,7 @@ namespace StatisticalWorker.Service.BLL
 
                         foreach (var unDepositCustomer in unDepositCustomers)
                         {
-                            if ((currentTime - unDepositCustomer.LastLockTime).TotalDays > 30)
+                            if ((currentTime - unDepositCustomer.LastLockTime).TotalDays > 60)
                             {
                                 var result = LockDormantAccountSet(unDepositCustomer.CustId, day);
                                 if (result >= 0)
