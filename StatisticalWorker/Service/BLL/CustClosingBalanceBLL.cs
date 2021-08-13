@@ -31,9 +31,9 @@ namespace StatisticalWorker.Service.BLL
         /// </summary>
         /// <param name="parameter"></param>
         /// <returns>Affected row counts</returns>
-        public int SetCustClosingBalance(CustClosingBalanceParameterModel parameter)
+        public int SetCustClosingBalance()
         {
-            return _custClosingBalanceService.SetCustClosingBalanceData(parameter);
+            return _custClosingBalanceService.SetCustClosingBalanceData();
         }
 
         #endregion

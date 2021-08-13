@@ -25,18 +25,15 @@ namespace StatisticalWorker
             services.AddSingleton<OnlineCountService>();
             services.AddSingleton<TpBetRecordRelayService>();
             services.AddSingleton<CustClosingBalanceService>();
-
+            services.AddSingleton<CustomerService>();
+            
             //BLL
+            services.AddSingleton<SelLangBLL>();
             services.AddSingleton<SetLeaderBoardTableBLL>();
             services.AddSingleton<OnlineCountBLL>();
             services.AddSingleton<TpBetRecordRelayBLL>();
             services.AddSingleton<CustClosingBalanceBLL>();
-
-            //Worker
-            services.AddHostedService<LeaderBoardWorker>();
-            services.AddHostedService<OnlineCountWorker>();
-            services.AddHostedService<TpBetRecordRelayForReportWorker>();
-            services.AddHostedService<CustClosingBalanceWorker>();
+            services.AddSingleton<CustomerBLL>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

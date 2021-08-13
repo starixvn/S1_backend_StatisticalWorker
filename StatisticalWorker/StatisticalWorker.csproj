@@ -29,7 +29,7 @@
     <Compile Update="App_GlobalResources\StatisticalWorker_lan_en.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-      <DependentUpon>StatisticalWorker_lan_en.resx</DependentUpon>
+      <DependentUpon>StatisticalWorker_lan_ch.resx</DependentUpon>
     </Compile>
   </ItemGroup>
 

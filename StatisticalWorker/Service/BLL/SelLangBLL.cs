@@ -1,0 +1,42 @@
+﻿using System.Collections.Concurrent;
+using System.Reflection;
+using System.Resources;
+
+namespace StatisticalWorker.Service.BLL
+{
+    public class SelLangBLL
+    {
+        private readonly ConcurrentDictionary<string, ResourceManager> rm = new ConcurrentDictionary<string, ResourceManager>();
+        public SelLangBLL()
+        { }
+        public string GetResourceValue(string key, string langId)
+        {
+            return GetResourceValue(key, "StatisticalWorker_lan", langId);
+        }
+        private string GetResourceValue(string key, string categoryId, string langId)
+        {
+            var labelString = string.Empty;
+            var sKey = $"{Assembly.GetExecutingAssembly().GetName().Name}.App_GlobalResources.{categoryId}_{langId}";
+            if (!rm.ContainsKey(sKey))
+            {
+                rm.TryAdd(sKey, new ResourceManager(sKey, Assembly.GetExecutingAssembly()));
+            }
+
+            try
+            {
+                labelString = rm[sKey].GetString(key);
+            }
+            catch (MissingManifestResourceException mme)
+            {
+
+            }
+
+            if (string.IsNullOrEmpty(labelString) && langId != "en")
+            {
+                labelString = GetResourceValue(key, categoryId, "en");
+            }
+
+            return labelString;
+        }
+    }
+}

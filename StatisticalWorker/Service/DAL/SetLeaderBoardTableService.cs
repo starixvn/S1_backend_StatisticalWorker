@@ -48,7 +48,7 @@ namespace StatisticalWorker.Service.DAL
                     if (i == RtyTimes - 1)
                     {
                         log2File.Error($"{i + 1} Time\r\n{ex}", "LeaderBoardWorkerLog");
-                        logger.LogError(ex.Message);
+                        logger.LogError(ex, ex.Message);
                         break;
                     }
                 }
@@ -101,7 +101,7 @@ namespace StatisticalWorker.Service.DAL
                     if (i == RtyTimes - 1)
                     {
                         log2File.Error($"{i + 1} Time\r\n{ex}", "LeaderBoardWorkerV2Log");
-                        logger.LogError(ex.Message);
+                        logger.LogError(ex, ex.Message);
                         break;
                     }
                 }
