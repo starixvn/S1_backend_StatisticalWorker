@@ -2,11 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
 using StatisticalWorker.Service.Model;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace StatisticalWorker.Service.DAL
 {
@@ -49,8 +45,7 @@ namespace StatisticalWorker.Service.DAL
                 });
                 parameters.Add("TotalCount", totalCount, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
 
-                string SpName = "Relay_TpBetRecord_Set";
-                conn.Execute(SpName, parameters, commandType: CommandType.StoredProcedure);
+                conn.Execute("Relay_TpBetRecord_Set", parameters, commandType: CommandType.StoredProcedure,commandTimeout:90);
 
                 totalCount = parameters.Get<int?>("TotalCount") ?? 0;
 
