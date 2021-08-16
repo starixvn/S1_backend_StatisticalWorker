@@ -106,12 +106,15 @@ namespace StatisticalWorker.Workers
 
                                 //#endregion
 
+                                int timeoutSeconds = _configuration.GetValue<int>("TpBetRecordRelayParam:TimeOutSeconds");
+
                                 int totalCount = _tpBetRecordRelayBLL.SetTpBetRecordRelayForReport(
                                                  new TpBetRecordRelayForReportParameterModel()
                                                  {
                                                      Table = false,
                                                      StartDate = string.Empty,
-                                                     EndDate = string.Empty
+                                                     EndDate = string.Empty,
+                                                     TimeoutSeconds = timeoutSeconds
                                                  });
 
                                 _log2File.Info(string.Format("TpBetRecordRelayForReportWorker-{0} Run Success. Affected Count:{1}", GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss"), totalCount), "TpBetRecordRelayForReportWorker");
