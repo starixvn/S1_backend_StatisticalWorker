@@ -43,5 +43,6 @@ namespace StatisticalWorker.Service.Model
         public string EndTime { get; set; }
         public string TimeZoom { get; set; }
         public string SPName { get; set; }
+        public string ExtraPointSP { get; set; }
     }
 }

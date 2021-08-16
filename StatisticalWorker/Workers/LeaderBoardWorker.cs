@@ -235,7 +235,7 @@ namespace StatisticalWorker.Workers
                 }
             }
             //var item = setLeaderBoardTableBLL.GetLeaderBoardExtraPoint(EventData.SiteId, EventData.EventCode, EventData.StartTime, EventData.EndTime, EventData.TimeZoom);
-            foreach (var leaderBoardExtraPoint in setLeaderBoardTableBLL.GetLeaderBoardExtraPoint(EventData.SiteId, EventData.EventCode, EventData.StartTime, EventData.EndTime, EventData.TimeZoom))
+            foreach (var leaderBoardExtraPoint in setLeaderBoardTableBLL.GetLeaderBoardExtraPoint(EventData.SiteId, EventData.EventCode, EventData.StartTime, EventData.EndTime, EventData.TimeZoom, EventData.ExtraPointSP))
             {
                 if (dd.ContainsKey($"{leaderBoardExtraPoint.CategoryId}_{leaderBoardExtraPoint.CustId}"))
                 {
