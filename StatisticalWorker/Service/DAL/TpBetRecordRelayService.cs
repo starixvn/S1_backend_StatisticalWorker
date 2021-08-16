@@ -45,7 +45,7 @@ namespace StatisticalWorker.Service.DAL
                 });
                 parameters.Add("TotalCount", totalCount, dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
 
-                conn.Execute("Relay_TpBetRecord_Set", parameters, commandType: CommandType.StoredProcedure,commandTimeout:param.TimeoutSeconds);
+                conn.Execute("Relay_TpBetRecord_Set", parameters, commandType: CommandType.StoredProcedure,commandTimeout: param.TimeoutSeconds);
 
                 totalCount = parameters.Get<int?>("TotalCount") ?? 0;
 
