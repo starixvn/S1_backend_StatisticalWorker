@@ -12,5 +12,7 @@ namespace StatisticalWorker.Service.Model
         public string StartDate { get; set; }
 
         public string EndDate { get; set; }
+
+        public int TimeoutSeconds { get; set; }
     }
 }
