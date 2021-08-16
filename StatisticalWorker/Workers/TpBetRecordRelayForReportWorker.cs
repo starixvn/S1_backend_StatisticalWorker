@@ -24,6 +24,8 @@ namespace StatisticalWorker.Workers
         private readonly IConfiguration _configuration;
         private string processDate = string.Empty;
 
+        private int execCount = 0;
+
         #endregion
 
         #region Construction method
@@ -59,76 +61,82 @@ namespace StatisticalWorker.Workers
         /// <param name="state"></param>
         private void RelayTpBetRecordForReport(object state)
         {
+            Interlocked.Increment(ref execCount);
 
-            var beginAt = GetUTC8Time();
-            string today = beginAt.Date.ToString();
-            try
+            if (execCount == 1)
             {
-                if (DateTime.TryParse($"{beginAt:yyyy/MM/dd} {_configuration.GetValue<string>("TpBetRecordRelayParam:StartTime")}", out DateTime startTime) &&
-                    DateTime.TryParse($"{beginAt:yyyy/MM/dd} {_configuration.GetValue<string>("TpBetRecordRelayParam:EndTime")}", out DateTime endTime))
+
+                var beginAt = GetUTC8Time();
+                string today = beginAt.Date.ToString();
+                try
                 {
-                    _log2File.Info($"TpBetRecordRelayForReportWorker-StartTime={startTime}，EndTime={endTime}，BeginAt={GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss")}", "TpBetRecordRelayForReportWorker");
-                    _logger.LogInformation($"{startTime} - {endTime} {beginAt}");
-
-                    if (endTime < startTime)
+                    if (DateTime.TryParse($"{beginAt:yyyy/MM/dd} {_configuration.GetValue<string>("TpBetRecordRelayParam:StartTime")}", out DateTime startTime) &&
+                    DateTime.TryParse($"{beginAt:yyyy/MM/dd} {_configuration.GetValue<string>("TpBetRecordRelayParam:EndTime")}", out DateTime endTime))
                     {
-                        endTime = endTime.AddDays(1);
-                    }
+                        _log2File.Info($"TpBetRecordRelayForReportWorker-StartTime={startTime}，EndTime={endTime}，BeginAt={GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss")}", "TpBetRecordRelayForReportWorker");
+                        _logger.LogInformation($"{startTime} - {endTime} {beginAt}");
 
-                    if (today != processDate) //Don't do it again.
-                    {
-
-                        _log2File.Info($"TpBetRecordRelayForReportWorker-{GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss")}  Run Start.", "TpBetRecordRelayForReportWorker");
-                        _logger.LogInformation($"TpBetRecordRelayForReportWorker-{GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss")}  Run Start.");
-
-                        if (GetUTC8Time() >= startTime && GetUTC8Time() <= endTime)
+                        if (endTime < startTime)
                         {
-                            //#region CheckParameter
+                            endTime = endTime.AddDays(1);
+                        }
 
-                            //if (!CheckParameter(false,
-                            //               _configuration.GetValue<string>("TpBetRecordRelayParam:StartDate"),
-                            //               _configuration.GetValue<string>("TpBetRecordRelayParam:EndDate"),
-                            //               out bool table,
-                            //               out string startDate,
-                            //               out string endDate))
-                            //{
-                            //    _log2File.Info(string.Format("TpBetRecordRelayForReportWorker-{0} Parameter Check Fail. ", GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss")), "TpBetRecordRelayForReportWorker");
-                            //    _logger.LogInformation(string.Format("TpBetRecordRelayForReportWorker-{0}  Parameter Check Fail.", GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss")));
+                        if (today != processDate) //Don't do it again.
+                        {
 
-                            //    return;
-                            //}
+                            _log2File.Info($"TpBetRecordRelayForReportWorker-{GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss")}  Run Start.", "TpBetRecordRelayForReportWorker");
+                            _logger.LogInformation($"TpBetRecordRelayForReportWorker-{GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss")}  Run Start.");
 
-                            //#endregion
+                            if (GetUTC8Time() >= startTime && GetUTC8Time() <= endTime)
+                            {
+                                //#region CheckParameter
 
-                            int totalCount = _tpBetRecordRelayBLL.SetTpBetRecordRelayForReport(
-                                             new TpBetRecordRelayForReportParameterModel()
-                                             {
-                                                 Table = false,
-                                                 StartDate = string.Empty,
-                                                 EndDate = string.Empty
-                                             });
+                                //if (!CheckParameter(false,
+                                //               _configuration.GetValue<string>("TpBetRecordRelayParam:StartDate"),
+                                //               _configuration.GetValue<string>("TpBetRecordRelayParam:EndDate"),
+                                //               out bool table,
+                                //               out string startDate,
+                                //               out string endDate))
+                                //{
+                                //    _log2File.Info(string.Format("TpBetRecordRelayForReportWorker-{0} Parameter Check Fail. ", GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss")), "TpBetRecordRelayForReportWorker");
+                                //    _logger.LogInformation(string.Format("TpBetRecordRelayForReportWorker-{0}  Parameter Check Fail.", GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss")));
 
-                            _log2File.Info(string.Format("TpBetRecordRelayForReportWorker-{0} Run Success. Affected Count:{1}", GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss"), totalCount), "TpBetRecordRelayForReportWorker");
-                            _logger.LogInformation(string.Format("TpBetRecordRelayForReportWorker-{0}  Run Success.Affected Count:{1}", GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss"), totalCount));
+                                //    return;
+                                //}
 
-                            processDate = today;
+                                //#endregion
 
-                            Thread.Sleep(_configuration.GetValue<int>("TpBetRecordRelayParam:ColdDownTime") * 1000);
+                                int totalCount = _tpBetRecordRelayBLL.SetTpBetRecordRelayForReport(
+                                                 new TpBetRecordRelayForReportParameterModel()
+                                                 {
+                                                     Table = false,
+                                                     StartDate = string.Empty,
+                                                     EndDate = string.Empty
+                                                 });
+
+                                _log2File.Info(string.Format("TpBetRecordRelayForReportWorker-{0} Run Success. Affected Count:{1}", GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss"), totalCount), "TpBetRecordRelayForReportWorker");
+                                _logger.LogInformation(string.Format("TpBetRecordRelayForReportWorker-{0}  Run Success.Affected Count:{1}", GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss"), totalCount));
+
+                                processDate = today;
+
+                                Thread.Sleep(_configuration.GetValue<int>("TpBetRecordRelayParam:ColdDownTime") * 1000);
+                            }
                         }
                     }
                 }
-            }
-            catch (Exception ex)
-            {
+                catch (Exception ex)
+                {
 
-                _logger.LogError(ex, ex.Message);
+                    _logger.LogError(ex, ex.Message);
 
+                }
+                finally
+                {
+                    TimeSpan dueTimeSpan = TimeSpan.FromSeconds(_configuration.GetValue<int>("TpBetRecordRelayParam:CheckTime"));
+                    _timer.Change(dueTimeSpan, TimeSpan.Zero);
+                }
             }
-            finally
-            {
-                TimeSpan dueTimeSpan = TimeSpan.FromSeconds(_configuration.GetValue<int>("TpBetRecordRelayParam:CheckTime"));
-                _timer.Change(dueTimeSpan, TimeSpan.Zero);
-            }
+            Interlocked.Decrement(ref execCount);
         }
 
         private DateTime GetUTC8Time()
