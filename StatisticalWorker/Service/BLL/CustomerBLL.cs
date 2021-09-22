@@ -40,11 +40,6 @@ namespace StatisticalWorker.Service.BLL
                     foreach (var day in dormantSetting.Days)
                     {
                         var statusList = new List<int> {(int) CustStatus.Running};
-                        if (day == 180)
-                        {
-                            statusList.Add((int) CustStatus.Lock);
-                        }
-                        
                         var unDepositCustomers = GetDormantAccount(new DormantAccountInput
                         {
                             SiteId = dormantSetting.SiteId,
@@ -104,7 +99,7 @@ namespace StatisticalWorker.Service.BLL
             return _customerService.LockDormantAccountSet(new LockDormantAccountInput
             {
                 CustId = custId,
-                Status = (day == 90 ? (int) CustStatus.Closed : (int) CustStatus.Lock)
+                Status = (int)CustStatus.Lock
             });
         }
 
