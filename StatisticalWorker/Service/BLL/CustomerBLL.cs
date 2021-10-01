@@ -49,7 +49,7 @@ namespace StatisticalWorker.Service.BLL
 
                         foreach (var unDepositCustomer in unDepositCustomers)
                         {
-                            if ((currentTime - unDepositCustomer.LastLockTime).TotalDays > 60)
+                            if ((currentTime - unDepositCustomer.LastLockTime).TotalDays > 180)
                             {
                                 var result = LockDormantAccountSet(unDepositCustomer.CustId, day);
                                 if (result >= 0)
