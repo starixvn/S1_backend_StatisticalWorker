@@ -65,16 +65,19 @@ namespace StatisticalWorker.Workers
 
             if (execCount == 1)
             {
-
                 var beginAt = GetUTC8Time();
                 string today = beginAt.Date.ToString();
+
+                _log2File.Info($"TpBetRecordRelayForReportWorker- Thread Start. {GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss")}.", "TpBetRecordRelayForReportWorker");
+                _logger.LogInformation($"TpBetRecordRelayForReportWorker- Thread Start. {GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss")}.");
+
                 try
                 {
                     if (DateTime.TryParse($"{beginAt:yyyy/MM/dd} {_configuration.GetValue<string>("TpBetRecordRelayParam:StartTime")}", out DateTime startTime) &&
                     DateTime.TryParse($"{beginAt:yyyy/MM/dd} {_configuration.GetValue<string>("TpBetRecordRelayParam:EndTime")}", out DateTime endTime))
                     {
-                        _log2File.Info($"TpBetRecordRelayForReportWorker-StartTime={startTime}，EndTime={endTime}，BeginAt={GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss")}", "TpBetRecordRelayForReportWorker");
-                        _logger.LogInformation($"{startTime} - {endTime} {beginAt}");
+                        _log2File.Info($"TpBetRecordRelayForReportWorker- Parameter Get Success. StartTime={startTime}，EndTime={endTime}，BeginAt={beginAt}.", "TpBetRecordRelayForReportWorker");
+                        _logger.LogInformation($"TpBetRecordRelayForReportWorker- Parameter Get Success. StartTime={startTime}，EndTime={endTime}，BeginAt={beginAt}.");
 
                         if (endTime < startTime)
                         {
@@ -84,8 +87,8 @@ namespace StatisticalWorker.Workers
                         if (today != processDate) //Don't do it again.
                         {
 
-                            _log2File.Info($"TpBetRecordRelayForReportWorker-{GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss")}  Run Start.", "TpBetRecordRelayForReportWorker");
-                            _logger.LogInformation($"TpBetRecordRelayForReportWorker-{GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss")}  Run Start.");
+                            _log2File.Info($"TpBetRecordRelayForReportWorker- Run Start. {GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss")}.", "TpBetRecordRelayForReportWorker");
+                            _logger.LogInformation($"TpBetRecordRelayForReportWorker- Run Start. {GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss")}.");
 
                             if (GetUTC8Time() >= startTime && GetUTC8Time() <= endTime)
                             {
@@ -106,7 +109,21 @@ namespace StatisticalWorker.Workers
 
                                 //#endregion
 
-                                int timeoutSeconds = _configuration.GetValue<int>("TpBetRecordRelayParam:TimeOutSeconds");
+                                _log2File.Info($"TpBetRecordRelayForReportWorker- Judge Success. result is need to run. {GetUTC8Time()} >= {startTime} && {GetUTC8Time()} <= {endTime}. {GetUTC8Time().ToString("yyyy / MM / dd HH: mm:ss")}.", "TpBetRecordRelayForReportWorker");
+                                _logger.LogInformation($"TpBetRecordRelayForReportWorker- Judge Success. result is need to run. {GetUTC8Time()} >= {startTime} && {GetUTC8Time()} <= {endTime}. {GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss")}.");
+
+
+                                int timeoutSeconds = _configuration.GetValue<int?>("TpBetRecordRelayParam:TimeOutSeconds") == null
+                                                     ? 30
+                                                     : (int)_configuration.GetValue<int?>("TpBetRecordRelayParam:TimeOutSeconds");
+
+                                _log2File.Info($"TpBetRecordRelayForReportWorker- TimeOutSeconds = {timeoutSeconds}", "TpBetRecordRelayForReportWorker");
+                                _logger.LogInformation($"TpBetRecordRelayForReportWorker- TimeOutSeconds = {timeoutSeconds}.");
+
+                                //temp log: 先補紀錄用(ELK上可以查詢，不用上Server調log)
+                                _log2File.Error($"TpBetRecordRelayForReportWorker- TimeOutSeconds = {timeoutSeconds}", "TpBetRecordRelayForReportWorker");
+                                _logger.LogError($"TpBetRecordRelayForReportWorker- TimeOutSeconds = {timeoutSeconds}.");
+
 
                                 int totalCount = _tpBetRecordRelayBLL.SetTpBetRecordRelayForReport(
                                                  new TpBetRecordRelayForReportParameterModel()
@@ -117,27 +134,40 @@ namespace StatisticalWorker.Workers
                                                      TimeoutSeconds = timeoutSeconds
                                                  });
 
-                                _log2File.Info(string.Format("TpBetRecordRelayForReportWorker-{0} Run Success. Affected Count:{1}", GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss"), totalCount), "TpBetRecordRelayForReportWorker");
-                                _logger.LogInformation(string.Format("TpBetRecordRelayForReportWorker-{0}  Run Success.Affected Count:{1}", GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss"), totalCount));
+                                _log2File.Info($"TpBetRecordRelayForReportWorker- Run Success. Affected Count:{totalCount}. {GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss")}", "TpBetRecordRelayForReportWorker");
+                                _logger.LogInformation($"TpBetRecordRelayForReportWorker- Run Success.Affected Count:{totalCount}. {GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss")}");
+
+                                //temp log: 先補紀錄用(ELK上可以查詢，不用上Server調log)
+                                _log2File.Error($"TpBetRecordRelayForReportWorker- Run Success. Affected Count:{totalCount}. {GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss")}", "TpBetRecordRelayForReportWorker");
+                                _logger.LogError($"TpBetRecordRelayForReportWorker- Run Success.Affected Count:{totalCount}. {GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss")}");
 
                                 processDate = today;
 
                                 Thread.Sleep(_configuration.GetValue<int>("TpBetRecordRelayParam:ColdDownTime") * 1000);
+                            }
+                            else
+                            {
+                                _log2File.Info($"TpBetRecordRelayForReportWorker- Judge Success. result is can't run. {GetUTC8Time()} >= {startTime} && {GetUTC8Time()} <= {endTime}. {GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss")}", "TpBetRecordRelayForReportWorker");
+                                _logger.LogInformation($"TpBetRecordRelayForReportWorker- Judge Success. result is can't run. {GetUTC8Time()} >= {startTime} && {GetUTC8Time()} <= {endTime}. {GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss")}");
                             }
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-
+                    _log2File.Error($"TpBetRecordRelayForReportWorker- Error：{ex.Message}. {ex}", "TpBetRecordRelayForReportWorker");
                     _logger.LogError(ex, ex.Message);
 
                 }
                 finally
                 {
+                    _log2File.Info($"TpBetRecordRelayForReportWorker- Run End. {GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss")}", "TpBetRecordRelayForReportWorker");
+                    _logger.LogInformation($"TpBetRecordRelayForReportWorker- Run End. {GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss")}");
                     TimeSpan dueTimeSpan = TimeSpan.FromSeconds(_configuration.GetValue<int>("TpBetRecordRelayParam:CheckTime"));
                     _timer.Change(dueTimeSpan, TimeSpan.Zero);
                 }
+                _log2File.Info($"TpBetRecordRelayForReportWorker- Thread End. {GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss")}.", "TpBetRecordRelayForReportWorker");
+                _logger.LogInformation($"TpBetRecordRelayForReportWorker- Thread End. {GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss")}.");
             }
             Interlocked.Decrement(ref execCount);
         }
