@@ -121,8 +121,8 @@ namespace StatisticalWorker.Workers
                                 _logger.LogInformation($"TpBetRecordRelayForReportWorker- TimeOutSeconds = {timeoutSeconds}.");
 
                                 //temp log: 先補紀錄用(ELK上可以查詢，不用上Server調log)
-                                _log2File.Error($"TpBetRecordRelayForReportWorker- TimeOutSeconds = {timeoutSeconds}", "TpBetRecordRelayForReportWorker");
-                                _logger.LogError($"TpBetRecordRelayForReportWorker- TimeOutSeconds = {timeoutSeconds}.");
+                                _log2File.Info($"TpBetRecordRelayForReportWorker- TimeOutSeconds = {timeoutSeconds}", "TpBetRecordRelayForReportWorker");
+                                _logger.LogWarning($"TpBetRecordRelayForReportWorker- TimeOutSeconds = {timeoutSeconds}.");
 
 
                                 int totalCount = _tpBetRecordRelayBLL.SetTpBetRecordRelayForReport(
@@ -138,8 +138,8 @@ namespace StatisticalWorker.Workers
                                 _logger.LogInformation($"TpBetRecordRelayForReportWorker- Run Success.Affected Count:{totalCount}. {GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss")}");
 
                                 //temp log: 先補紀錄用(ELK上可以查詢，不用上Server調log)
-                                _log2File.Error($"TpBetRecordRelayForReportWorker- Run Success. Affected Count:{totalCount}. {GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss")}", "TpBetRecordRelayForReportWorker");
-                                _logger.LogError($"TpBetRecordRelayForReportWorker- Run Success.Affected Count:{totalCount}. {GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss")}");
+                                _log2File.Info($"TpBetRecordRelayForReportWorker- Run Success. Affected Count:{totalCount}. {GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss")}", "TpBetRecordRelayForReportWorker");
+                                _logger.LogWarning($"TpBetRecordRelayForReportWorker- Run Success.Affected Count:{totalCount}. {GetUTC8Time().ToString("yyyy/MM/dd HH:mm:ss")}");
 
                                 processDate = today;
 
