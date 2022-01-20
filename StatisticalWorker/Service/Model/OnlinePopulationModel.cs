@@ -8,6 +8,7 @@ namespace StatisticalWorker.Service.Model
     public class OnlineCountModel
     {
         public int SiteId { get; set; }
+        public byte DeviceType { get; set; }
         public int Count { get; set; }
     }
 }

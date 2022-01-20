@@ -40,11 +40,11 @@ namespace StatisticalWorker.Workers
         #region - private method - 
         private void SetOnlineCount(object state)
         {
-            DateTime dtime = GetUTC8Time();
+            var dTime = GetUTC8Time();
             try
             {
-                log2File.Info(string.Format("OnlineCountWorker-{0}", dtime.ToString("yyyy/MM/dd HH:mm:ss")), "OnlineCountWorker");
-                logger.LogInformation(string.Format("OnlineCountWorker-{0}", dtime.ToString("yyyy/MM/dd HH:mm:ss")));
+                log2File.Info(string.Format("OnlineCountWorker-{0}", dTime.ToString("yyyy/MM/dd HH:mm:ss")), "OnlineCountWorker");
+                logger.LogInformation(string.Format("OnlineCountWorker-{0}", dTime.ToString("yyyy/MM/dd HH:mm:ss")));
                 var onlineCountData = onlinePopulationBLL.GetOnlineOnlineUsersData();
                 onlinePopulationBLL.SetOnlineCountData(onlineCountData);
             }
@@ -55,7 +55,7 @@ namespace StatisticalWorker.Workers
             finally
             {
                 //執行完後，隔10分鐘再執行
-                TimeSpan dueTimeSpan = TimeSpan.FromMinutes(10);
+                var dueTimeSpan = TimeSpan.FromMinutes(10);
                 timer.Change(dueTimeSpan, TimeSpan.Zero);
             }
         }
