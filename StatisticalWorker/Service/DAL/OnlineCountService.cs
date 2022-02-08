@@ -29,14 +29,14 @@ namespace StatisticalWorker.Service.DAL
         #region - method -
         public IEnumerable<OnlineCountModel> GetOnlineOnlineUsersData()
         {
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.Query<OnlineCountModel>("Service_OnlineUsers_Get", commandType: CommandType.StoredProcedure);
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+            return conn.Query<OnlineCountModel>("Service_OnlineUsers_Get_V2", commandType: CommandType.StoredProcedure);
         }
 
         public void SetOnlineCountData(IEnumerable<OnlineCountModel> para)
         {
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            conn.Execute("Service_OnlineCount_Set", para, commandType: CommandType.StoredProcedure);
+            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            conn.Execute("Service_OnlineCount_Set_V2", para, commandType: CommandType.StoredProcedure);
         }
         #endregion
     }
