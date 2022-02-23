@@ -50,7 +50,7 @@ namespace StatisticalWorker
             {
                 endpoints.MapGet("/", async context =>
                 {
-                    await context.Response.WriteAsync("Hello World!");
+                    await context.Response.WriteAsync("Hello World!This is Statistical Worker.");
                 });
             });
         }
