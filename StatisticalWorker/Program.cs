@@ -1,7 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Text;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,12 +17,6 @@ namespace StatisticalWorker
 {
     public class Program
     {
-        private static IConfigurationRoot Configuration => new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddEnvironmentVariables()
-            .AddJsonFile($"appsettings.json", false, true)
-            .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", false, true)
-            .Build();
         public static void Main(string[] args)
         {
             CreateHostBuilder(args).Build().Run();
@@ -29,10 +26,21 @@ namespace StatisticalWorker
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseSerilog((hostContext, loggerConfiguration) =>
+                    webBuilder
+                        .ConfigureAppConfiguration((hostContext, builder) =>
+                        {
+                            builder
+                                .SetBasePath(Directory.GetCurrentDirectory())
+                                .AddEnvironmentVariables()
+                                .AddJsonFile($"appsettings.json", false, true)
+                                .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", false, true);
+                            hostContext.Configuration = builder.Build();
+                            builder.AddJsonStream(GetRemoteConfig(hostContext.Configuration.GetSection("ConfigService").Get<string[]>()));
+                        })
+                        .UseSerilog((hostContext, loggerConfiguration) =>
                         {
                             loggerConfiguration
-                                .ReadFrom.Configuration(Configuration)
+                                .ReadFrom.Configuration(hostContext.Configuration)
                                 .Enrich.FromLogContext()
                                 .Enrich.WithExceptionDetails();
                         })
@@ -44,10 +52,33 @@ namespace StatisticalWorker
                     services.AddHostedService<OnlineCountWorker>();
                     services.AddHostedService<TpBetRecordRelayForReportWorker>();
                     services.AddHostedService<CustClosingBalanceWorker>();
-                    if (Configuration.GetSection("RunCustomerWorker").Get<bool>())
+                    if (hostContext.Configuration.GetSection("RunCustomerWorker").Get<bool>())
                     {
                         services.AddHostedService<CustomerWorker>();
                     }
                 });
+        
+        private static MemoryStream GetRemoteConfig(IEnumerable<string> remoteUrls)
+        {
+            using var client = new HttpClient();
+            Stream result = null;
+            foreach (var url in remoteUrls)
+            {
+                if (string.IsNullOrEmpty(url))
+                {
+                    continue;
+                }
+
+                try
+                {
+                    result = client.GetAsync(url).Result.Content.ReadAsStreamAsync().Result;
+                    break;
+                }
+                catch { }
+            }
+
+            using var streamReader = new StreamReader(result);
+            return new MemoryStream(Encoding.UTF8.GetBytes(streamReader.ReadToEnd()));
+        }
     }
 }
