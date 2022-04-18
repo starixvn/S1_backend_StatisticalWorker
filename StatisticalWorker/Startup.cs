@@ -51,7 +51,7 @@ namespace StatisticalWorker
             {
                 endpoints.MapGet("/", async context =>
                 {
-                    await context.Response.WriteAsync($"Hello World ! This is Statistical Worker.\n" +
+                    await context.Response.WriteAsync($"Hello World ! This is Statistical Worker. Auto Test\n" +
                                                       $"Environment = {env.EnvironmentName}.\n" +
                                                       $"Time = {DateTime.Now.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff' 'zzz''")}.");
                 });
