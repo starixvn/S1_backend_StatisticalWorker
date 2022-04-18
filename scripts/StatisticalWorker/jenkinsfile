@@ -12,7 +12,7 @@ pipeline {
                 script {
                     env.version = sh (script: 'git rev-parse --short=7 HEAD', returnStdout: true).trim()
                 }
-                sh 'sudo docker build -f ./StatisticalWorker/StatisticalWorker/Dockerfile -t ${registry}/${proj}:${version} .'
+                sh 'sudo docker build -f ./StatisticalWorker/Dockerfile -t ${registry}/${proj}:${version} .'
                 sh 'sudo docker login ${registry} -u admin -p 123456'
                 sh 'sudo docker push ${registry}/${proj}:${version}'
             }
