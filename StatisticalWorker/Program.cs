@@ -1,84 +1,42 @@
-using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Exceptions;
+using StatisticalWorker;
+using StatisticalWorker.Service.Extensions;
 using StatisticalWorker.Workers;
 
-namespace StatisticalWorker
+var builder = WebApplication.CreateBuilder(args);
+builder.Configuration.AddRemoteJsonConfig(builder.Configuration.GetSection("ConfigService").Get<string[]>());
+
+var excludesMessage = builder.Configuration.GetSection("ExcludesMessage").Get<string[]>();
+var excludesApiEndpoints = builder.Configuration.GetSection("ExcludesApiEndpoint").Get<string[]>();
+builder.Host.UseSerilog((context, Configuration) =>
 {
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            CreateHostBuilder(args).Build().Run();
-        }
+    Configuration
+        .ReadFrom.Configuration(builder.Configuration)
+        .Enrich.FromLogContext()
+        .Filter.ByExcluding(c =>
+            c.Properties.Any(p =>
+                excludesApiEndpoints.Any(item => p.Value.ToString().Contains(item))
+                || excludesMessage.Any(item => c.MessageTemplate.ToString().Contains(item))))
+        .Enrich.WithExceptionDetails();
+});
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder
-                        .ConfigureAppConfiguration((hostContext, builder) =>
-                        {
-                            builder
-                                .SetBasePath(Directory.GetCurrentDirectory())
-                                .AddEnvironmentVariables()
-                                .AddJsonFile($"appsettings.json", false, true)
-                                .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", false, true);
-                            hostContext.Configuration = builder.Build();
-                            builder.AddJsonStream(GetRemoteConfig(hostContext.Configuration.GetSection("ConfigService").Get<string[]>()));
-                        })
-                        .UseSerilog((hostContext, loggerConfiguration) =>
-                        {
-                            loggerConfiguration
-                                .ReadFrom.Configuration(hostContext.Configuration)
-                                .Enrich.FromLogContext()
-                                .Enrich.WithExceptionDetails();
-                        })
-                        .UseStartup<Startup>();
-                })
-                .ConfigureServices((hostContext, services) =>
-                {
-                    services.AddHostedService<LeaderBoardWorker>();
-                    services.AddHostedService<OnlineCountWorker>();
-                    services.AddHostedService<TpBetRecordRelayForReportWorker>();
-                    services.AddHostedService<CustClosingBalanceWorker>();
-                    if (hostContext.Configuration.GetSection("RunCustomerWorker").Get<bool>())
-                    {
-                        services.AddHostedService<CustomerWorker>();
-                    }
-                });
-        
-        private static MemoryStream GetRemoteConfig(IEnumerable<string> remoteUrls)
-        {
-            using var client = new HttpClient();
-            Stream result = null;
-            foreach (var url in remoteUrls)
-            {
-                if (string.IsNullOrEmpty(url))
-                {
-                    continue;
-                }
+var startup = new Startup();
+startup.ConfigureServices(builder.Services);
 
-                try
-                {
-                    result = client.GetAsync(url).Result.Content.ReadAsStreamAsync().Result;
-                    break;
-                }
-                catch { }
-            }
 
-            using var streamReader = new StreamReader(result);
-            return new MemoryStream(Encoding.UTF8.GetBytes(streamReader.ReadToEnd()));
-        }
-    }
+builder.Services
+    .AddHostedService<LeaderBoardWorker>()
+    .AddHostedService<OnlineCountWorker>()
+    .AddHostedService<TpBetRecordRelayForReportWorker>()
+    .AddHostedService<CustClosingBalanceWorker>();
+
+if (builder.Configuration.GetSection("RunCustomerWorker").Get<bool>())
+{
+    builder.Services.AddHostedService<CustomerWorker>();
 }
+
+var app = builder.Build();
+startup.Configure(app, builder.Environment);
+
+app.Run();
