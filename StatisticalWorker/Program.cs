@@ -21,23 +21,21 @@ builder.Host.UseSerilog((context, Configuration) =>
         .Enrich.WithExceptionDetails();
 });
 
-var startup = new Startup();
+var startup = new Startup(builder.Configuration);
 startup.ConfigureServices(builder.Services);
 
-var serviceType = Environment.GetEnvironmentVariable("ServiceType");
-if (!string.IsNullOrEmpty(serviceType) && serviceType.Equals("worker", StringComparison.OrdinalIgnoreCase))
-{
-    builder.Services
-        .AddHostedService<LeaderBoardWorker>()
-        .AddHostedService<OnlineCountWorker>()
-        .AddHostedService<TpBetRecordRelayForReportWorker>()
-        .AddHostedService<CustClosingBalanceWorker>();
 
-    if (builder.Configuration.GetSection("RunCustomerWorker").Get<bool>())
-    {
-        builder.Services.AddHostedService<CustomerWorker>();
-    }
+builder.Services
+    .AddHostedService<LeaderBoardWorker>()
+    .AddHostedService<OnlineCountWorker>()
+    .AddHostedService<TpBetRecordRelayForReportWorker>()
+    .AddHostedService<CustClosingBalanceWorker>();
+
+if (builder.Configuration.GetSection("RunCustomerWorker").Get<bool>())
+{
+    builder.Services.AddHostedService<CustomerWorker>();
 }
+
 var app = builder.Build();
 startup.Configure(app, builder.Environment);
 

@@ -1,43 +1,27 @@
-﻿using Dapper;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using MySql.Data.MySqlClient;
-using StatisticalWorker.Service.Library;
+﻿using StatisticalWorker.Service.Library;
 using StatisticalWorker.Service.Model;
-using StatisticalWorker.Workers;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
+using StatisticalWorker.Service.Model.enums;
 
 namespace StatisticalWorker.Service.DAL
 {
     public class OnlineCountService
     {
-        #region - property -
-        private readonly IConfiguration configuration;
-        #endregion
-
-        #region - Construction method -
-        public OnlineCountService(IConfiguration configuration)
+        private readonly MySqlClient _mainDbClient;
+        private readonly MySqlClient _reportDbClient;
+        public OnlineCountService(IServiceProvider provider)
         {
-            this.configuration = configuration;
+            _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
+            _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
-        #endregion
 
-        #region - method -
         public IEnumerable<OnlineCountModel> GetOnlineOnlineUsersData()
-        {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.Query<OnlineCountModel>("Service_OnlineUsers_Get_V2", commandType: CommandType.StoredProcedure);
+        {         
+            return _reportDbClient.Query<OnlineCountModel>("Service_OnlineUsers_Get_V2");
         }
 
         public void SetOnlineCountData(IEnumerable<OnlineCountModel> para)
         {
-            using var conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            conn.Execute("Service_OnlineCount_Set_V2", para, commandType: CommandType.StoredProcedure);
+            _mainDbClient.Execute("Service_OnlineCount_Set_V2", para);
         }
-        #endregion
     }
 }

@@ -1,56 +1,37 @@
-﻿using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using StatisticalWorker.Service.BLL;
-using StatisticalWorker.Service.Library;
-using StatisticalWorker.Service.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using StatisticalWorker.Service.BLL;
 
 namespace StatisticalWorker.Workers
 {
     public class OnlineCountWorker : BackgroundService
     {
-        #region - property -
         private Timer timer;
-        private readonly OnlineCountBLL onlinePopulationBLL;
-        private readonly ILogger<OnlineCountWorker> logger;
-        private readonly Log2File log2File;
-        #endregion
+        private readonly OnlineCountBLL _onlinePopulationBLL;
+        private readonly ILogger<OnlineCountWorker> _logger;
 
-        #region - Construction method -
-        public OnlineCountWorker(ILogger<OnlineCountWorker> logger, OnlineCountBLL onlinePopulationBLL, Log2File log2File)
+        public OnlineCountWorker(IServiceProvider serviceProvider)
         {
-            this.logger = logger;
-            this.onlinePopulationBLL = onlinePopulationBLL;
-            this.log2File = log2File;
+            _logger = serviceProvider.GetRequiredService<ILogger<OnlineCountWorker>>();
+            _onlinePopulationBLL = serviceProvider.GetRequiredService<OnlineCountBLL>();
         }
-        #endregion
 
-        #region - protected method- 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
             timer = new Timer(SetOnlineCount, null, TimeSpan.Zero, TimeSpan.Zero);
             return Task.CompletedTask;
         }
-        #endregion
 
-        #region - private method - 
         private void SetOnlineCount(object state)
         {
             var dTime = GetUTC8Time();
             try
-            {
-                log2File.Info(string.Format("OnlineCountWorker-{0}", dTime.ToString("yyyy/MM/dd HH:mm:ss")), "OnlineCountWorker");
-                logger.LogInformation(string.Format("OnlineCountWorker-{0}", dTime.ToString("yyyy/MM/dd HH:mm:ss")));
-                var onlineCountData = onlinePopulationBLL.GetOnlineOnlineUsersData();
-                onlinePopulationBLL.SetOnlineCountData(onlineCountData);
+            {                
+                _logger.LogInformation($"OnlineCountWorker-{dTime:yyyy/MM/dd HH:mm:ss}");
+                var onlineCountData = _onlinePopulationBLL.GetOnlineOnlineUsersData();
+                _onlinePopulationBLL.SetOnlineCountData(onlineCountData);
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, ex.Message);
+                _logger.LogError(ex, ex.Message);
             }
             finally
             {
@@ -64,6 +45,6 @@ namespace StatisticalWorker.Workers
         {
             return new DateTimeOffset(DateTime.Now).ToOffset(new TimeSpan(8, 0, 0)).DateTime;
         }
-        #endregion
+
     }
 }

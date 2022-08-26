@@ -1,25 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
+﻿using System.Data;
 using System.Diagnostics;
-using System.Threading.Tasks;
 using Dapper;
-using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using Serilog.Context;
+using StatisticalWorker.Service.Model.enums;
 
 namespace StatisticalWorker.Service.Library
 {
     public class MySqlClient
     {
+        public DataBase DataBase { get; set; }
         private readonly string _connectionString;
-
         private readonly ILogger<MySqlClient> _logger;
 
-        public MySqlClient(string connectionString, ILogger<MySqlClient> logger)
+        public MySqlClient(string connectionString, ILogger<MySqlClient> logger, DataBase dataBase)
         {
             _connectionString = connectionString;
             _logger = logger;
+            DataBase = dataBase;
         }
 
         public async Task<T> QueryFirstAsync<T>(string name, DynamicParameters parameters)
@@ -43,7 +41,7 @@ namespace StatisticalWorker.Service.Library
             return result;
         }
 
-        public T QueryFirst<T>(string name, DynamicParameters parameters)
+        public T QueryFirst<T>(string name, object parameters, int? commandTimeout = null)
         {
             T result;
             var sw = Stopwatch.StartNew();
@@ -64,14 +62,14 @@ namespace StatisticalWorker.Service.Library
             return result;
         }
 
-        public int Execute(string name, DynamicParameters parameters)
+        public int Execute(string name, object parameters, int? commandTimeout = null)
         {
             var result = 0;
             var sw = Stopwatch.StartNew();
             try
             {
                 using var connection = new MySqlConnection(_connectionString);
-                result = connection.Execute(name, parameters, commandType: CommandType.StoredProcedure);
+                result = connection.Execute(name, param: parameters, commandType: CommandType.StoredProcedure, commandTimeout: commandTimeout);
             }
             catch (Exception e)
             {
@@ -165,7 +163,7 @@ namespace StatisticalWorker.Service.Library
             return result;
         }
 
-        public IEnumerable<T> Query<T>(string name, DynamicParameters parameters, int? commandTimeout = null)
+        public IEnumerable<T> Query<T>(string name, object parameters, int? commandTimeout = null)
         {
             IEnumerable<T> result;
             var sw = Stopwatch.StartNew();
