@@ -21,7 +21,6 @@ namespace StatisticalWorker
             //DAL
             services.AddSingleton<SetLeaderBoardTableService>();
             services.AddSingleton<OnlineCountService>();
-            services.AddSingleton<TpBetRecordRelayService>();
             services.AddSingleton<CustClosingBalanceService>();
             services.AddSingleton<CustomerService>();
             
@@ -29,7 +28,6 @@ namespace StatisticalWorker
             services.AddSingleton<SelLangBLL>();
             services.AddSingleton<SetLeaderBoardTableBLL>();
             services.AddSingleton<OnlineCountBLL>();
-            services.AddSingleton<TpBetRecordRelayBLL>();
             services.AddSingleton<CustClosingBalanceBLL>();
             services.AddSingleton<CustomerBLL>();
         }

@@ -28,7 +28,6 @@ startup.ConfigureServices(builder.Services);
 builder.Services
     .AddHostedService<LeaderBoardWorker>()
     .AddHostedService<OnlineCountWorker>()
-    .AddHostedService<TpBetRecordRelayForReportWorker>()
     .AddHostedService<CustClosingBalanceWorker>();
 
 if (builder.Configuration.GetSection("RunCustomerWorker").Get<bool>())
