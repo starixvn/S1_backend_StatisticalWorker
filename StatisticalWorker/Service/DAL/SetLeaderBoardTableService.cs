@@ -1,139 +1,99 @@
 ﻿using Dapper;
 using StatisticalWorker.Service.Model;
 using StatisticalWorker.Workers;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
 using StatisticalWorker.Service.Library;
+using StatisticalWorker.Service.Model.enums;
 
 namespace StatisticalWorker.Service.DAL
 {
     public class SetLeaderBoardTableService
     {
-        #region - property -
-        private readonly ILogger<LeaderBoardWorker> logger;
-        private readonly IConfiguration configuration;
-        private readonly Log2File log2File;
-        #endregion
+        private readonly ILogger<LeaderBoardWorker> _logger;
+        private readonly MySqlClient _mainDbClient;
+        private readonly MySqlClient _reportDbClient;
 
-        #region - Construction method -
-        public SetLeaderBoardTableService(IConfiguration configuration, ILogger<LeaderBoardWorker> logger, Log2File log2File)
+        public SetLeaderBoardTableService(IServiceProvider provider)
         {
-            this.configuration = configuration;
-            this.log2File = log2File;
-            this.logger = logger;
+            _logger = provider.GetRequiredService<ILogger<LeaderBoardWorker>>();
+            _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
+            _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
-        #endregion
 
-        #region - method -
+
         public void SetLeaderBoardTableDll(IEnumerable<LeaderBoardModel> LeaderBoardData)
         {
             //至多重新執行 N 次
             int RtyTimes = 2;
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+           
             for (int i = 0; i < RtyTimes; ++i)
             {
                 try
                 {
-                    conn.Execute("Service_Leaderboard_Set", LeaderBoardData, commandType: CommandType.StoredProcedure);
+                    _mainDbClient.Execute("Service_Leaderboard_Set", LeaderBoardData);
                     break;
                 }
                 catch (Exception ex)
                 {
                     if (i == RtyTimes - 1)
                     {
-                        log2File.Error($"{i + 1} Time\r\n{ex}", "LeaderBoardWorkerLog");
-                        logger.LogError(ex, ex.Message);
+                        _logger.LogError(ex, ex.Message);
                         break;
                     }
                 }
             }
-        }
-        public IEnumerable<LeaderBoardModel> GetN88LeaderBoardDataDll(int is14)
-        {
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.Query<LeaderBoardModel>("Service_Leaderboard_N88Get", new { Is14 = is14 }, commandTimeout: 180, commandType: CommandType.StoredProcedure);
-        }
-
-        public IEnumerable<LeaderBoardModel> GetBGLeaderBoardDataDll(int is14)
-        {
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.Query<LeaderBoardModel>("Service_Leaderboard_BGGet", new { Is14 = is14 }, commandTimeout: 180, commandType: CommandType.StoredProcedure);
-        }
-
-        public void SetLeaderBoardDepositDll(IEnumerable<DepositModel> DepositData)
-        {
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            conn.Execute("Service_LeaderboardDeposit_Set", DepositData, commandType: CommandType.StoredProcedure);
-        }
-
-        public IEnumerable<DepositModel> GetN88LeaderBoardDepositDll()
-        {
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.Query<DepositModel>("Service_LeaderboardDeposit_N88Get", null, commandType: CommandType.StoredProcedure);
-        }
-
-        public IEnumerable<DepositModel> GetBGLeaderBoardDepositDll()
-        {
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.Query<DepositModel>("Service_LeaderboardDeposit_BGGet", null, commandType: CommandType.StoredProcedure);
         }
 
         public void SetLeaderBoardTableV2(IEnumerable<LeaderBoardModelV2> LeaderBoardData)
         {
             //至多重新執行 N 次
-            int RtyTimes = 2;
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
+            int RtyTimes = 2;         
             for (int i = 0; i < RtyTimes; ++i)
             {
                 try
                 {
-                    conn.Execute("Service_LeaderboardV2_Set", LeaderBoardData, commandType: CommandType.StoredProcedure);
+                    _mainDbClient.Execute("Service_LeaderboardV2_Set", LeaderBoardData);
                     break;
                 }
                 catch (Exception ex)
                 {
                     if (i == RtyTimes - 1)
                     {
-                        log2File.Error($"{i + 1} Time\r\n{ex}", "LeaderBoardWorkerV2Log");
-                        logger.LogError(ex, ex.Message);
+                        _logger.LogError(ex, ex.Message);
                         break;
                     }
                 }
             }
         }
+        
         public IEnumerable<LeaderBoardModelV2> GetLeaderBoardDataV2(int is14, int siteId, string eventCode, string startDate, string endDate, string timeZone, string sPName)
-        {
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.Query<LeaderBoardModelV2>(sPName, new { SiteId = siteId, EventCode = eventCode, StartDate = startDate, EndDate = endDate, TimeZone = timeZone, Is14 = is14 }, commandType: CommandType.StoredProcedure);
+        {    
+            return _reportDbClient.Query<LeaderBoardModelV2>(sPName, new { SiteId = siteId, EventCode = eventCode, StartDate = startDate, EndDate = endDate, TimeZone = timeZone, Is14 = is14 });
         }
+        
         public IEnumerable<LeaderBoardModelV2> GetLeaderBoardExtraPoint( int siteId, string eventCode, string startDate, string endDate, string timeZone, string sPName)
         {
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
+         
             if(sPName != null && sPName != "")
             {
-                return conn.Query<LeaderBoardModelV2>(sPName, new { SiteId = siteId, EventCode = eventCode, StartDate = startDate, EndDate = endDate, TimeZone = timeZone }, commandType: CommandType.StoredProcedure);
+                return _reportDbClient.Query<LeaderBoardModelV2>(sPName, new { SiteId = siteId, EventCode = eventCode, StartDate = startDate, EndDate = endDate, TimeZone = timeZone });
             }
             else
             {
-                return conn.Query<LeaderBoardModelV2>("Service_LeaderboardExtraPoint_Get", new { SiteId = siteId, EventCode = eventCode, StartDate = startDate, EndDate = endDate, TimeZone = timeZone }, commandType: CommandType.StoredProcedure);
+                return _reportDbClient.Query<LeaderBoardModelV2>("Service_LeaderboardExtraPoint_Get", new { SiteId = siteId, EventCode = eventCode, StartDate = startDate, EndDate = endDate, TimeZone = timeZone });
             }
         }
+        
         public IEnumerable<LeaderBoardEvent> GetLeaderboardEvent()
-        {
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionStringReport"));
-            return conn.Query<LeaderBoardEvent>("Service_LeaderboardEvent_Get", commandType: CommandType.StoredProcedure);
+        { 
+            return _reportDbClient.Query<LeaderBoardEvent>("Service_LeaderboardEvent_Get");
         }
+        
         public void CheckLeaderboardOverTime()
         {
-            using MySqlConnection conn = new MySqlConnection(configuration.GetConnectionString("ConnectionString"));
-            conn.Execute("Service_LeaderboardOverTime_Set", commandType: CommandType.StoredProcedure);
+            _mainDbClient.Execute("Service_LeaderboardOverTime_Set");
         }
-        #endregion
+
     }
 }

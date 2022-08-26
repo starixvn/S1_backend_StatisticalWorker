@@ -1,35 +1,26 @@
 ﻿using StatisticalWorker.Service.DAL;
 using StatisticalWorker.Service.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace StatisticalWorker.Service.BLL
 {
     public class OnlineCountBLL
     {
-        #region - property -
-        private readonly OnlineCountService onlinePopulationService;
-        #endregion
+        private readonly OnlineCountService _onlinePopulationService;
 
-        #region - Construction method -
-        public OnlineCountBLL(OnlineCountService onlinePopulationService)
+        public OnlineCountBLL(IServiceProvider provider)
         {
-            this.onlinePopulationService = onlinePopulationService;
+            _onlinePopulationService = provider.GetRequiredService<OnlineCountService>();
         }
-        #endregion
 
-        #region - method -
         public IEnumerable<OnlineCountModel> GetOnlineOnlineUsersData()
         {
-            return onlinePopulationService.GetOnlineOnlineUsersData();
+            return _onlinePopulationService.GetOnlineOnlineUsersData();
         }
 
         public void SetOnlineCountData(IEnumerable<OnlineCountModel> para)
         {
-            onlinePopulationService.SetOnlineCountData(para);
+            _onlinePopulationService.SetOnlineCountData(para);
         }
-        #endregion
+
     }
 }

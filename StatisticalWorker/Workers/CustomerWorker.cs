@@ -1,11 +1,4 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using StatisticalWorker.Service.BLL;
+﻿using StatisticalWorker.Service.BLL;
 using StatisticalWorker.Service.Extensions;
 
 namespace StatisticalWorker.Workers
@@ -16,14 +9,12 @@ namespace StatisticalWorker.Workers
         private readonly IHostEnvironment _environment;
         private readonly ILogger<CustomerWorker> _logger;
         private readonly CustomerBLL _customerBll;
-        private readonly IConfiguration _configuration;
 
         public CustomerWorker(IServiceProvider serviceProvider)
         {
-            _logger = serviceProvider.GetRequiredService<ILogger<CustomerWorker>>();;
+            _logger = serviceProvider.GetRequiredService<ILogger<CustomerWorker>>();
             _customerBll = serviceProvider.GetRequiredService<CustomerBLL>();
             _environment = serviceProvider.GetRequiredService<IHostEnvironment>();
-            _configuration = serviceProvider.GetRequiredService<IConfiguration>();
         }
         
         protected override Task ExecuteAsync(CancellationToken stoppingToken)

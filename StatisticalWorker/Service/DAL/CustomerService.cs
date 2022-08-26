@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using Dapper;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+﻿using Dapper;
 using StatisticalWorker.Service.Library;
 using StatisticalWorker.Service.Model;
+using StatisticalWorker.Service.Model.enums;
 
 namespace StatisticalWorker.Service.DAL
 {
@@ -13,12 +9,10 @@ namespace StatisticalWorker.Service.DAL
     {
         private readonly MySqlClient _mainDbClient;
         private readonly MySqlClient _reportDbClient;
-        public CustomerService(IServiceProvider serviceProvider)
+        public CustomerService(IServiceProvider provider)
         {
-            var configuration = serviceProvider.GetRequiredService<IConfiguration>();
-            var mySqlLogger = serviceProvider.GetRequiredService<ILogger<MySqlClient>>();
-            _mainDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionString"), mySqlLogger);
-            _reportDbClient = new MySqlClient(configuration.GetConnectionString("ConnectionStringReport"), mySqlLogger);
+            _mainDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Main);
+            _reportDbClient = provider.GetServices<MySqlClient>().First(p => p.DataBase == DataBase.Report);
         }
         
         public IEnumerable<DormantSettingOutput> GetDormantSetting()
