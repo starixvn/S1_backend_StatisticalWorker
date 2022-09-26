@@ -1,27 +1,26 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using StatisticalWorker.Service.BLL;
 using StatisticalWorker.Service.DAL;
+using StatisticalWorker.Service.Extensions;
 using StatisticalWorker.Service.Library;
-using StatisticalWorker.Workers;
-using System;
 
 namespace StatisticalWorker
 {
     public class Startup
     {
+        private readonly IConfiguration _configuration;
+
+        public Startup(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
         public void ConfigureServices(IServiceCollection services)
         {
-            //Library
-            services.AddSingleton<Log2File>();
+            services.AddDatabaseConnection(_configuration);
 
             //DAL
             services.AddSingleton<SetLeaderBoardTableService>();
             services.AddSingleton<OnlineCountService>();
-            services.AddSingleton<TpBetRecordRelayService>();
             services.AddSingleton<CustClosingBalanceService>();
             services.AddSingleton<CustomerService>();
             
@@ -29,7 +28,6 @@ namespace StatisticalWorker
             services.AddSingleton<SelLangBLL>();
             services.AddSingleton<SetLeaderBoardTableBLL>();
             services.AddSingleton<OnlineCountBLL>();
-            services.AddSingleton<TpBetRecordRelayBLL>();
             services.AddSingleton<CustClosingBalanceBLL>();
             services.AddSingleton<CustomerBLL>();
         }

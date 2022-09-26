@@ -21,14 +21,13 @@ builder.Host.UseSerilog((context, Configuration) =>
         .Enrich.WithExceptionDetails();
 });
 
-var startup = new Startup();
+var startup = new Startup(builder.Configuration);
 startup.ConfigureServices(builder.Services);
 
 
 builder.Services
     .AddHostedService<LeaderBoardWorker>()
     .AddHostedService<OnlineCountWorker>()
-    .AddHostedService<TpBetRecordRelayForReportWorker>()
     .AddHostedService<CustClosingBalanceWorker>();
 
 if (builder.Configuration.GetSection("RunCustomerWorker").Get<bool>())
