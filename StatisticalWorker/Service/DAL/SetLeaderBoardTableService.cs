@@ -26,7 +26,7 @@ namespace StatisticalWorker.Service.DAL
         {
             //至多重新執行 N 次
             int RtyTimes = 2;
-           
+
             for (int i = 0; i < RtyTimes; ++i)
             {
                 try
@@ -48,7 +48,7 @@ namespace StatisticalWorker.Service.DAL
         public void SetLeaderBoardTableV2(IEnumerable<LeaderBoardModelV2> LeaderBoardData)
         {
             //至多重新執行 N 次
-            int RtyTimes = 2;         
+            int RtyTimes = 2;
             for (int i = 0; i < RtyTimes; ++i)
             {
                 try
@@ -66,16 +66,16 @@ namespace StatisticalWorker.Service.DAL
                 }
             }
         }
-        
+
         public IEnumerable<LeaderBoardModelV2> GetLeaderBoardDataV2(int is14, int siteId, string eventCode, string startDate, string endDate, string timeZone, string sPName)
-        {    
-            return _reportDbClient.Query<LeaderBoardModelV2>(sPName, new { SiteId = siteId, EventCode = eventCode, StartDate = startDate, EndDate = endDate, TimeZone = timeZone, Is14 = is14 });
-        }
-        
-        public IEnumerable<LeaderBoardModelV2> GetLeaderBoardExtraPoint( int siteId, string eventCode, string startDate, string endDate, string timeZone, string sPName)
         {
-         
-            if(sPName != null && sPName != "")
+            return _reportDbClient.Query<LeaderBoardModelV2>(sPName, new { SiteId = siteId, EventCode = eventCode, StartDate = startDate, EndDate = endDate, TimeZone = timeZone, Is14 = is14 }, commandTimeout: 300);
+        }
+
+        public IEnumerable<LeaderBoardModelV2> GetLeaderBoardExtraPoint(int siteId, string eventCode, string startDate, string endDate, string timeZone, string sPName)
+        {
+
+            if (sPName != null && sPName != "")
             {
                 return _reportDbClient.Query<LeaderBoardModelV2>(sPName, new { SiteId = siteId, EventCode = eventCode, StartDate = startDate, EndDate = endDate, TimeZone = timeZone });
             }
@@ -84,12 +84,12 @@ namespace StatisticalWorker.Service.DAL
                 return _reportDbClient.Query<LeaderBoardModelV2>("Service_LeaderboardExtraPoint_Get", new { SiteId = siteId, EventCode = eventCode, StartDate = startDate, EndDate = endDate, TimeZone = timeZone });
             }
         }
-        
+
         public IEnumerable<LeaderBoardEvent> GetLeaderboardEvent()
-        { 
+        {
             return _reportDbClient.Query<LeaderBoardEvent>("Service_LeaderboardEvent_Get");
         }
-        
+
         public void CheckLeaderboardOverTime()
         {
             _mainDbClient.Execute("Service_LeaderboardOverTime_Set");
