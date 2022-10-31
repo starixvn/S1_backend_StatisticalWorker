@@ -69,7 +69,7 @@ namespace StatisticalWorker.Service.DAL
 
         public IEnumerable<LeaderBoardModelV2> GetLeaderBoardDataV2(int is14, int siteId, string eventCode, string startDate, string endDate, string timeZone, string sPName)
         {
-            return _reportDbClient.Query<LeaderBoardModelV2>(sPName, new { SiteId = siteId, EventCode = eventCode, StartDate = startDate, EndDate = endDate, TimeZone = timeZone, Is14 = is14 }, commandTimeout: 300);
+            return _reportDbClient.Query<LeaderBoardModelV2>(sPName, new { SiteId = siteId, EventCode = eventCode, StartDate = startDate, EndDate = endDate, TimeZone = timeZone, Is14 = is14 }, commandTimeout: 0);
         }
 
         public IEnumerable<LeaderBoardModelV2> GetLeaderBoardExtraPoint(int siteId, string eventCode, string startDate, string endDate, string timeZone, string sPName)
