@@ -24,16 +24,16 @@ builder.Host.UseSerilog((context, Configuration) =>
 var startup = new Startup(builder.Configuration);
 startup.ConfigureServices(builder.Services);
 
+//將Worker搬移至Hangfire，DEV先暫時關閉
+//builder.Services
+//    .AddHostedService<LeaderBoardWorker>()
+//    .AddHostedService<OnlineCountWorker>()
+//    .AddHostedService<CustClosingBalanceWorker>();
 
-builder.Services
-    .AddHostedService<LeaderBoardWorker>()
-    .AddHostedService<OnlineCountWorker>()
-    .AddHostedService<CustClosingBalanceWorker>();
-
-if (builder.Configuration.GetSection("RunCustomerWorker").Get<bool>())
-{
-    builder.Services.AddHostedService<CustomerWorker>();
-}
+//if (builder.Configuration.GetSection("RunCustomerWorker").Get<bool>())
+//{
+//    builder.Services.AddHostedService<CustomerWorker>();
+//}
 
 var app = builder.Build();
 startup.Configure(app, builder.Environment);
